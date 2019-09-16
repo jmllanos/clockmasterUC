@@ -17,16 +17,14 @@
 #include <ArduinoHttpServer.h>
 #include <EEPROM.h>
 
-#include <tiva_configuration.h>
-#include <clock_master_commands.h>
+#include <TIVAConfiguration.h>
 #include <read_write_registers.h>
-#include <network_commands.h>
-#include <pps_divider.h>
+#include <PPSDivider.h>
+#include <ClockMaster.h>
+#include <network.h>
 
 //###################################################
 uint32_t invalid = 0;//bool
-uint32_t multiplier;
-uint32_t divider;
 uint32_t gps_disciplined;
 uint32_t ref;
 
@@ -49,15 +47,10 @@ EthernetClient client;
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 byte response[] = {0x0, 0x0, 0x0};
 
-Network RC_Network;
-
 volatile uint8_t state = 0;
 
+ClockMaster master;
 //***********************************************
-pps_divider pps_divider_0(0);
-pps_divider pps_divider_1(1);
-pps_divider pps_divider_2(2);
-pps_divider pps_divier_3(3);
 
 void setup()
 {
@@ -69,18 +62,16 @@ void setup()
   pinMode(GEAR_LED, OUTPUT);
   pinMode(INT_LED, OUTPUT);
   DEBUG_RC_PRINTLN("Leds configured.");
+  
   //revisar!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  NETWORK_INIT_CONFIG(RC_Network);
+  master.NETWORK_INIT_CONFIG();
 
   INIT_I2C();
 
   INIT_SPI();
-  
-  //Reset chip
-  WRITE_CONTROLLER_REGISTER(RESET,0x00,response);
 
-  START_ETH(mac, RC_Network, server);
+  master.START_ETH(mac, server);
 
   initTimer(1); // timer a 0.5 hz..................
 
@@ -93,6 +84,119 @@ void setup()
 
 void loop()
 {
+  ResetWatchDogTimer(ncycles_WDT);
+
+  TEST_WATCHDOG();
+
+  if(change_ip_flag)
+  {
+    change_ip_flag=false;
+  }
+
+  client = server.available();
+
+  if (client.connected())
+  {
+    // Connected to client. Allocate and initialize StreamHttpRequest object.
+    ArduinoHttpServer::StreamHttpRequest<80000> httpRequest(client);
+    ArduinoHttpServer::StreamHttpReply httpReply(client, "application/json");
+   
+    String http_response;
+    
+    // Parse the request
+    if (httpRequest.readRequest())
+    {
+      // Retrieve 2nd part of HTTP resource.
+      // E.g.: "on" from "/api/sensors/on"
+      char* data = (char*) httpRequest.getBody();
+      long data_length = (long) httpRequest.getContentLength();
+      DEBUG_RC_PRINTLN();
+      DEBUG_RC_PRINTLN("We have a new request!!!!");
+      DEBUG_RC_PRINT("Request length: ");
+      DEBUG_RC_PRINTLN(data_length);
+      DEBUG_RC_PRINT("Request type: ");
+      DEBUG_RC_PRINTLN( httpRequest.getResource()[0] );
+      DEBUG_RC_PRINTLN("Data received: ");
+      DEBUG_RC_PRINTLN(data);
+      DEBUG_RC_PRINTLN();
+
+      // Retrieve HTTP method.
+      // E.g.: GET / PUT / HEAD / DELETE /ip[3]=ip_data["ip"][3];
+      ArduinoHttpServer::MethodEnum method( ArduinoHttpServer::MethodInvalid);
+      method = httpRequest.getMethod();
+      
+      if ( method == ArduinoHttpServer::MethodGet)
+      {
+        digitalWrite(REST_LED, HIGH);
+        switch (str2request(httpRequest.getResource()[0]))
+        {
+          case Status:
+           
+            break;
+          case Error:
+            DEBUG_RC_PRINTLN("********************************************");
+            ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
+            httpReply.send(httpRequest.getErrorDescrition());
+            DEBUG_RC_PRINTLN("WRONG REST REQUEST RECEIVED!!!");
+            DEBUG_RC_PRINTLN("********************************************");
+            break;
+        }
+        digitalWrite(REST_LED, LOW);
+      }
+      else if ( method == ArduinoHttpServer::MethodPost)
+      {
+        digitalWrite(REST_LED, HIGH);
+        switch (str2request(httpRequest.getResource()[0]))
+        {
+          case Reset:
+            http_response=master.reset();
+            httpReply.send(http_response);
+            break;
+            
+          case Start:
+           
+            break;
+            
+          case Stop:
+            
+            break;
+            
+          case Setpps:
+           master.set_divider(data); 
+                       
+           break;
+          case ChangeIP:
+          
+            http_response=master.CHANGE_IP(data);
+            httpReply.send(http_response);
+           
+            break;
+          
+          case Error:
+            DEBUG_RC_PRINTLN("********************************************");
+            ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
+            httpReply.send(httpRequest.getErrorDescrition());
+            DEBUG_RC_PRINTLN("WRONG REST REQUEST RECEIVED!!!");
+            DEBUG_RC_PRINTLN("********************************************");
+            break;
+        }
+        digitalWrite(REST_LED, LOW);
+      }
+      else
+      {
+        DEBUG_RC_PRINTLN("METHOD NOT VALID");
+        ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
+        httpReply.send(httpRequest.getErrorDescrition());
+      }
+    }
+    else
+    {
+      ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
+      httpReply.send(httpRequest.getErrorDescrition());
+    }
+  }
+
+  client.stop();
 
 }
 
