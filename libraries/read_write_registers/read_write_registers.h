@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 #include <SPI.h>
-#include "tiva_configuration.h"
-#include "clock_master_registers.h"
+#include "TIVAConfiguration.h"
+#include "ClockMasterRegisters.h"
 
 void SendPacketSPI(byte address, byte buf_data, byte *resp);
 
