@@ -4,15 +4,15 @@
 
 void network::START_ETH(byte* mac, EthernetServer& server)
 {
-  DEBUG_RC_PRINTLN("Starting Ethernet Connection...");
+  DEBUG_CM_PRINTLN("Starting Ethernet Connection...");
   Ethernet.begin(mac, ip, dns, gateway, subnet);
 
   delay(1000);//#################################################
 
   server.begin();
-  DEBUG_RC_PRINTLN("Ethernet connection ready.");
-  DEBUG_RC_PRINT("Server is at ");
-  DEBUG_RC_PRINTLN(Ethernet.localIP());
+  DEBUG_CM_PRINTLN("Ethernet connection ready.");
+  DEBUG_CM_PRINT("Server is at ");
+  DEBUG_CM_PRINTLN(Ethernet.localIP());
 }
 
 
@@ -132,11 +132,11 @@ void network::NETWORK_INIT_CONFIG()
       gateway=new_gateway;
       subnet=new_subnet;
       
-      DEBUG_RC_PRINTLN("Stored network configuration verified.");
+      DEBUG_CM_PRINTLN("Stored network configuration verified.");
     }
     else
     {
-      DEBUG_RC_PRINTLN("Wrong stored network configuration");
+      DEBUG_CM_PRINTLN("Wrong stored network configuration");
     }
       delay(100);
 }
@@ -145,14 +145,14 @@ String network::CHANGE_IP(char* data)
 {
  String http_reply;
  
- DEBUG_RC_PRINTLN("***************************************************");
- DEBUG_RC_PRINTLN("Changing IP data...");
+ DEBUG_CM_PRINTLN("***************************************************");
+ DEBUG_CM_PRINTLN("Changing IP data...");
  
  GET_USER_IP(data);
  
  if(CHECK_VALID_IP())
  {
-  DEBUG_RC_PRINTLN("New Ethernet configuration received.");
+  DEBUG_CM_PRINTLN("New Ethernet configuration received.");
   http_reply="{\"changeip\":\"ok\"}"; 
  
   ip=new_ip;
@@ -167,8 +167,20 @@ String network::CHANGE_IP(char* data)
   http_reply="{\"changeip\":\"invalid\"}";
  }
  
- DEBUG_RC_PRINTLN("Wrong IP data.");
+ DEBUG_CM_PRINTLN("Wrong IP data.");
  
  return http_reply; 
+}
+
+
+void network::UPDATE_ETH_CONFIG()
+{
+  LOAD_IP();
+
+  DEBUG_CM_PRINTLN("Changing Ethernet configuration.");
+  Ethernet.setStaticIP(ip, gateway, subnet);
+  DEBUG_CM_PRINTLN("Ethernet connection ready.");
+  DEBUG_CM_PRINT("Server is at ");
+  DEBUG_CM_PRINTLN(Ethernet.localIP());
 }
 

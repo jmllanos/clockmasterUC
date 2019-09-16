@@ -22,16 +22,12 @@
 #include <PPSDivider.h>
 #include <ClockMaster.h>
 #include <network.h>
+#include <PULSE_GENERATOR.h>
 
 //###################################################
 uint32_t invalid = 0;//bool
 uint32_t gps_disciplined;
 uint32_t ref;
-
-uint32_t bauds = 1;
-uint32_t ipp = 0;
-uint32_t ntx = 0;
-uint32_t n_samples = 0;
 
 const int buttonPin = PUSH2;//forced freeze
 
@@ -56,12 +52,12 @@ void setup()
 {
   ConfigWatchDog(ncycles_WDT);
 
-  DEBUG_RC_BEGIN(BAUD_RATE);
-  DEBUG_RC_PRINTLN("Serial started.");
+  DEBUG_CM_BEGIN(BAUD_RATE);
+  DEBUG_CM_PRINTLN("Serial started.");
   pinMode(REST_LED, OUTPUT);
   pinMode(GEAR_LED, OUTPUT);
   pinMode(INT_LED, OUTPUT);
-  DEBUG_RC_PRINTLN("Leds configured.");
+  DEBUG_CM_PRINTLN("Leds configured.");
   
   //revisar!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -110,15 +106,15 @@ void loop()
       // E.g.: "on" from "/api/sensors/on"
       char* data = (char*) httpRequest.getBody();
       long data_length = (long) httpRequest.getContentLength();
-      DEBUG_RC_PRINTLN();
-      DEBUG_RC_PRINTLN("We have a new request!!!!");
-      DEBUG_RC_PRINT("Request length: ");
-      DEBUG_RC_PRINTLN(data_length);
-      DEBUG_RC_PRINT("Request type: ");
-      DEBUG_RC_PRINTLN( httpRequest.getResource()[0] );
-      DEBUG_RC_PRINTLN("Data received: ");
-      DEBUG_RC_PRINTLN(data);
-      DEBUG_RC_PRINTLN();
+      DEBUG_CM_PRINTLN();
+      DEBUG_CM_PRINTLN("We have a new request!!!!");
+      DEBUG_CM_PRINT("Request length: ");
+      DEBUG_CM_PRINTLN(data_length);
+      DEBUG_CM_PRINT("Request type: ");
+      DEBUG_CM_PRINTLN( httpRequest.getResource()[0] );
+      DEBUG_CM_PRINTLN("Data received: ");
+      DEBUG_CM_PRINTLN(data);
+      DEBUG_CM_PRINTLN();
 
       // Retrieve HTTP method.
       // E.g.: GET / PUT / HEAD / DELETE /ip[3]=ip_data["ip"][3];
@@ -134,11 +130,11 @@ void loop()
            
             break;
           case Error:
-            DEBUG_RC_PRINTLN("********************************************");
+            DEBUG_CM_PRINTLN("********************************************");
             ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
             httpReply.send(httpRequest.getErrorDescrition());
-            DEBUG_RC_PRINTLN("WRONG REST REQUEST RECEIVED!!!");
-            DEBUG_RC_PRINTLN("********************************************");
+            DEBUG_CM_PRINTLN("WRONG REST REQUEST RECEIVED!!!");
+            DEBUG_CM_PRINTLN("********************************************");
             break;
         }
         digitalWrite(REST_LED, LOW);
@@ -173,18 +169,18 @@ void loop()
             break;
           
           case Error:
-            DEBUG_RC_PRINTLN("********************************************");
+            DEBUG_CM_PRINTLN("********************************************");
             ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
             httpReply.send(httpRequest.getErrorDescrition());
-            DEBUG_RC_PRINTLN("WRONG REST REQUEST RECEIVED!!!");
-            DEBUG_RC_PRINTLN("********************************************");
+            DEBUG_CM_PRINTLN("WRONG REST REQUEST RECEIVED!!!");
+            DEBUG_CM_PRINTLN("********************************************");
             break;
         }
         digitalWrite(REST_LED, LOW);
       }
       else
       {
-        DEBUG_RC_PRINTLN("METHOD NOT VALID");
+        DEBUG_CM_PRINTLN("METHOD NOT VALID");
         ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
         httpReply.send(httpRequest.getErrorDescrition());
       }
@@ -205,9 +201,9 @@ void TEST_WATCHDOG()
   int reading = digitalRead(buttonPin);
   if (reading != 1)
   {
-    DEBUG_RC_PRINTLN("*******");
-    DEBUG_RC_PRINTLN("FORCED SYSTEM FREEZE");
-    DEBUG_RC_PRINTLN("*******");
+    DEBUG_CM_PRINTLN("*******");
+    DEBUG_CM_PRINTLN("FORCED SYSTEM FREEZE");
+    DEBUG_CM_PRINTLN("*******");
     while(1);
   }
 }
@@ -248,16 +244,14 @@ void INIT_I2C()
   //el delay se ejecuta antes de q acabe wire begin por eso es q se 
   //imprime la siguiente linea....
   
-  DEBUG_RC_PRINTLN("I2C initialized");
-
-  DEBUG_RC_PRINTLN("duuuuuuuuuuuuuh");
+  DEBUG_CM_PRINTLN("I2C initialized");
 
   Wire.beginTransmission(2);
   Wire.write(0x00);//Comsend = 0x00
   Wire.write(0x38);
   uint8_t err = Wire.endTransmission();
-  DEBUG_RC_PRINTLN(err);
+  DEBUG_CM_PRINTLN(err);
 
-  DEBUG_RC_PRINTLN("pase i2c sin conexion");
+  DEBUG_CM_PRINTLN("pase i2c sin conexion");
   //----------------###################################revisar colgado por pull ups
 }

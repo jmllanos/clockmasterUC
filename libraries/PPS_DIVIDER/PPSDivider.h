@@ -9,28 +9,29 @@
 class PPSDivider
 {
 private:
-   int per_true_addr;
-   int divider_addr;
-   int phase_0_addr;
-   int phase_1_addr;
-   int phase_2_addr;
-   int width_addr;
-   int start_addr;
-   int stop_addr;
+   byte per_true_addr;
+   byte divider_addr;
+   byte phase_0_addr;
+   byte phase_1_addr;
+   byte phase_2_addr;
+   byte width_addr;
+   byte start_addr;
+   byte stop_addr;
    
-   int per_true;
-   int divider;
-   int phase;
-   int width;
-   int start;
-   int stop;
-   int channel;
+   byte per_true;
+   byte divider;
+   long phase;
+   byte width;
+   byte start;
+   byte stop;
+   byte channel;
 
 public:
   void set_parameters();
+  void get_parameters();
   void set_channel(int _channel); 
   void get_user_parameters(char* data);
-  int get_channel();
+  byte get_channel();
   void set_registers();
   
 };

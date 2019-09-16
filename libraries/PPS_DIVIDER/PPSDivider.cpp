@@ -6,31 +6,57 @@ void PPSDivider::set_channel(int _channel)
   set_registers();
 }
 
-int PPSDivider::get_channel()
+byte PPSDivider::get_channel()
 {
   return channel;
 }
 
 void PPSDivider::set_parameters()
 {
+    byte phase_0=phase;
+    byte phase_1=phase>>8;
+    byte phase_2=phase>>12;
+    
     byte response[3];
-    WRITE_CONTROLLER_REGISTER(per_true_addr,per_true,response);
+    WRITE_REGISTER(per_true_addr,per_true,response);
            
-    WRITE_CONTROLLER_REGISTER(divider_addr,divider,response);
+    WRITE_REGISTER(divider_addr,divider,response);
    
-    WRITE_CONTROLLER_REGISTER(phase_0_addr,phase,response);
+    WRITE_REGISTER(phase_0_addr,phase_0,response);
     
-    WRITE_CONTROLLER_REGISTER(phase_1_addr,phase,response);
+    WRITE_REGISTER(phase_1_addr,phase_1,response);
     
-    WRITE_CONTROLLER_REGISTER(phase_2_addr,phase,response);
+    WRITE_REGISTER(phase_2_addr,phase_2,response);
     
-    WRITE_CONTROLLER_REGISTER(width_addr,width,response);
+    WRITE_REGISTER(width_addr,width,response);
     
-    WRITE_CONTROLLER_REGISTER(start_addr,start,response);
+    WRITE_REGISTER(start_addr,start,response);
     
-    WRITE_CONTROLLER_REGISTER(stop_addr,stop,response);
+    WRITE_REGISTER(stop_addr,stop,response);
 
 }
+
+void PPSDivider::get_parameters()
+{    
+    byte response[3];
+    READ_REGISTER(per_true_addr,response);
+           
+    READ_REGISTER(divider_addr,response);
+   
+    READ_REGISTER(phase_0_addr,response);
+    
+    READ_REGISTER(phase_1_addr,response);
+    
+    READ_REGISTER(phase_2_addr,response);
+    
+    READ_REGISTER(width_addr,response);
+    
+    READ_REGISTER(start_addr,response);
+    
+    READ_REGISTER(stop_addr,response);
+
+}
+
 
 void PPSDivider::get_user_parameters(char* data)
 {

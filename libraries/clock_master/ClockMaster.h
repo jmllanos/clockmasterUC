@@ -26,7 +26,6 @@ enum UserRequest
 UserRequest str2request (String request);
 
 
-
 class ClockMaster : public network
 {
     private:

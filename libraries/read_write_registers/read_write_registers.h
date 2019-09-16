@@ -8,12 +8,12 @@
 
 void SendPacketSPI(byte address, byte buf_data, byte *resp);
 
-void READ_CONTROLLER_REGISTER(byte address, byte *resp);
+void READ_REGISTER(byte address, byte *resp);
 
-void WRITE_CONTROLLER_REGISTER(byte address, byte buf_data, byte *resp);
+void WRITE_REGISTER(byte address, byte buf_data, byte *resp);
 
 bool CHECK_CORRECT_READING(byte *resp);
 
-bool CHECK_CORRECT_SEND_DATA(byte *resp);
+bool CHECK_CORRECT_WRITING(byte *resp);
 
 #endif

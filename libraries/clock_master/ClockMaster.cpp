@@ -46,6 +46,7 @@ UserRequest str2request (String request)
 
 }
 
+// CLOCK MASTER CLASS
 ClockMaster::ClockMaster()
 {
   divider_0.set_channel(0);
@@ -59,31 +60,28 @@ void ClockMaster::set_divider(char* data)
 {
   PPSDivider tmp;    
   tmp.get_user_parameters(data);
+  DEBUG_CM_PRINTLN("***************************************************");
   switch(tmp.get_channel())
   {
      case 0:
      	divider_0=tmp;
      	divider_0.set_parameters();
-     	DEBUG_RC_PRINTLN("***************************************************");
-   	DEBUG_RC_PRINTLN("Set pps divider 0 parameters");
+   	DEBUG_CM_PRINTLN("Set pps divider 0 parameters");
    	break;
      case 1:
      	divider_1=tmp;
      	divider_1.set_parameters();
-   	DEBUG_RC_PRINTLN("***************************************************");
-   	DEBUG_RC_PRINTLN("Set pps divider 1 parameters");
+   	DEBUG_CM_PRINTLN("Set pps divider 1 parameters");
    	break;    
      case 2:
      	divider_2=tmp;
      	divider_2.set_parameters();
-   	DEBUG_RC_PRINTLN("***************************************************");
-   	DEBUG_RC_PRINTLN("Set pps divider 2 parameters");
+   	DEBUG_CM_PRINTLN("Set pps divider 2 parameters");
      	break;
      case 3:
      	divider_3=tmp;
      	divider_3.set_parameters();
-   	DEBUG_RC_PRINTLN("***************************************************");
-   	DEBUG_RC_PRINTLN("Set pps divider 3 parameters");
+   	DEBUG_CM_PRINTLN("Set pps divider 3 parameters");
      	break;
   }
   
@@ -91,30 +89,27 @@ void ClockMaster::set_divider(char* data)
 
 void ClockMaster::get_divider_parameters(int channel)
 {
+  DEBUG_CM_PRINTLN("***************************************************");
   switch(channel)
   {
    case 0: 
    	divider_0.get_channel();
-   	DEBUG_RC_PRINTLN("***************************************************");
-   	DEBUG_RC_PRINTLN("Get pps divider 0 parameters");
+   	DEBUG_CM_PRINTLN("Get pps divider 0 parameters");
     break;
 
    case 1: 
    	divider_1.get_channel();
-   	DEBUG_RC_PRINTLN("***************************************************");
-   	DEBUG_RC_PRINTLN("Get pps divider 1 parameters");
+    	DEBUG_CM_PRINTLN("Get pps divider 1 parameters");
     break;
 
    case 2: 
    	divider_2.get_channel();
-   	DEBUG_RC_PRINTLN("***************************************************");
-   	DEBUG_RC_PRINTLN("Get pps divider 2 parameters");
+   	DEBUG_CM_PRINTLN("Get pps divider 2 parameters");
     break;
 
    case 3: 
    	divider_3.get_channel();
-   	DEBUG_RC_PRINTLN("***************************************************");
-   	DEBUG_RC_PRINTLN("Get pps divider 3 parameters");
+   	DEBUG_CM_PRINTLN("Get pps divider 3 parameters");
     break;
   }
 }
@@ -124,14 +119,14 @@ String ClockMaster::reset()
   String reply;
   byte response[] = {0x0, 0x0, 0x0};
   //noInterrupts();
-  DEBUG_RC_PRINTLN("***************************************************");
-  DEBUG_RC_PRINTLN("Clock Master reset method:");
+  DEBUG_CM_PRINTLN("***************************************************");
+  DEBUG_CM_PRINTLN("Clock Master reset method:");
 
 
-  DEBUG_RC_PRINTLN("Writing RESET register.");
-  WRITE_CONTROLLER_REGISTER(RESET,0x00,response); // Reset chip
+  DEBUG_CM_PRINTLN("Writing RESET register.");
+  WRITE_REGISTER(RESET,0x00,response); // Reset chip
 
-  if (CHECK_CORRECT_SEND_DATA(response))
+  if (CHECK_CORRECT_WRITING(response))
   {
    reply="{\"reset\":\"ok\"}";
   }
