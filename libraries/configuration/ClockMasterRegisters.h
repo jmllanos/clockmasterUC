@@ -1,0 +1,145 @@
+
+#ifndef _CLOCK_MASTER_REGISTER_H_
+#define _CLOCK_MASTER_REGISTER_H_
+////////
+//BUSSES CONFIGURATION
+#define ADDR_WIDTH 7//one bit more
+#define DATA_WIDTH 8
+
+//READ ACKNOLEDGE ANSWER
+#define ACK_KEY     0x60
+
+//RESET 
+#define RESET 0x06
+
+//TIME_OF_DAY
+#define THUNDER_YEAR_L  0x07
+#define THUNDER_YEAR_H  0x08
+#define THUNDER_MONTH   0x09
+#define THUNDER_DAY     0x0A
+#define THUNDER_HOUR    0x0B
+#define THUNDER_MINUTES 0x0C
+#define THUNDER_SECONDS 0x0D
+
+//MAIN MEMORY ADDRESSES
+//CHANNEL CONFIG
+#define CH_MUX_SELECTOR 0x0E
+#define CH_MUX_ENABLE   0x0F
+
+//PULSE GENERATOR 0
+#define PG0_PULSE_ENA      0x10
+#define PG0_USR_YEAR_H     0x11
+#define PG0_USR_YEAR_L     0x12
+#define PG0_USR_MONTH      0x13
+#define PG0_USR_DAY        0x14
+#define PG0_USR_HOUR       0x15
+#define PG0_USR_MINUTES    0x16
+#define PG0_USR_SECONDS    0x17
+#define PG0_WIDTH_HIGH_3   0x18
+#define PG0_WIDTH_HIGH_2   0x19
+#define PG0_WIDTH_HIGH_1   0x1A
+#define PG0_WIDTH_HIGH_0   0x1B
+#define PG0_WIDTH_PERIOD_3 0x1C
+#define PG0_WIDTH_PERIOD_2 0x1D
+#define PG0_WIDTH_PERIOD_1 0x1E
+#define PG0_WIDTH_PERIOD_0 0x1F
+
+//PULSE GENERATOR 1
+#define PG1_PULSE_ENA      0x20
+#define PG1_USR_YEAR_H     0x21
+#define PG1_USR_YEAR_L     0x22
+#define PG1_USR_MONTH      0x23
+#define PG1_USR_DAY        0x24
+#define PG1_USR_HOUR       0x25
+#define PG1_USR_MINUTES    0x26
+#define PG1_USR_SECONDS    0x27
+#define PG1_WIDTH_HIGH_3   0x28
+#define PG1_WIDTH_HIGH_2   0x29
+#define PG1_WIDTH_HIGH_1   0x2A
+#define PG1_WIDTH_HIGH_0   0x2B
+#define PG1_WIDTH_PERIOD_3 0x2C
+#define PG1_WIDTH_PERIOD_2 0x2D
+#define PG1_WIDTH_PERIOD_1 0x2E
+#define PG1_WIDTH_PERIOD_0 0x2F
+
+//PULSE GENERATOR 2
+#define PG2_PULSE_ENA      0x30
+#define PG2_USR_YEAR_H     0x31
+#define PG2_USR_YEAR_L     0x32
+#define PG2_USR_MONTH      0x33
+#define PG2_USR_DAY        0x34
+#define PG2_USR_HOUR       0x35
+#define PG2_USR_MINUTES    0x36
+#define PG2_USR_SECONDS    0x37
+#define PG2_WIDTH_HIGH_3   0x38
+#define PG2_WIDTH_HIGH_2   0x39
+#define PG2_WIDTH_HIGH_1   0x3A
+#define PG2_WIDTH_HIGH_0   0x3B
+#define PG2_WIDTH_PERIOD_3 0x3C
+#define PG2_WIDTH_PERIOD_2 0x3D
+#define PG2_WIDTH_PERIOD_1 0x3E
+#define PG2_WIDTH_PERIOD_0 0x3F
+
+//PULSE GENERATOR 3
+#define PG3_PULSE_ENA      0x40
+#define PG3_USR_YEAR_H     0x41
+#define PG3_USR_YEAR_L     0x42
+#define PG3_USR_MONTH      0x43
+#define PG3_USR_DAY        0x44
+#define PG3_USR_HOUR       0x45
+#define PG3_USR_MINUTES    0x46
+#define PG3_USR_SECONDS    0x47
+#define PG3_WIDTH_HIGH_3   0x48
+#define PG3_WIDTH_HIGH_2   0x49
+#define PG3_WIDTH_HIGH_1   0x4A
+#define PG3_WIDTH_HIGH_0   0x4B
+#define PG3_WIDTH_PERIOD_3 0x4C
+#define PG3_WIDTH_PERIOD_2 0x4D
+#define PG3_WIDTH_PERIOD_1 0x4E
+#define PG3_WIDTH_PERIOD_0 0x4F
+
+//PPS DIVIDER 0
+#define PPS_DIV_0_PER_TRUE 0x50
+#define PPS_DIV_0_DIV_NUM  0x51
+#define PPS_DIV_0_PHASE_0  0x52
+#define PPS_DIV_0_PHASE_1  0x53
+#define PPS_DIV_0_PHASE_2  0x54
+#define PPS_DIV_0_PHASE_3  0x55
+#define PPS_DIV_0_WIDTH    0x56
+#define PPS_DIV_0_START    0x57
+#define PPS_DIV_0_STOP     0x58
+
+//PPS DIVIDER 1
+#define PPS_DIV_1_PER_TRUE 0x59
+#define PPS_DIV_1_DIV_NUM  0x5A
+#define PPS_DIV_1_PHASE_0  0x5B
+#define PPS_DIV_1_PHASE_1  0x5C
+#define PPS_DIV_1_PHASE_2  0x5D
+#define PPS_DIV_1_PHASE_3  0x5E
+#define PPS_DIV_1_WIDTH    0x5F
+#define PPS_DIV_1_START    0x60
+#define PPS_DIV_1_STOP     0x61
+
+//PPS DIVIDER 2
+#define PPS_DIV_2_PER_TRUE 0x62
+#define PPS_DIV_2_DIV_NUM  0x63
+#define PPS_DIV_2_PHASE_0  0x64
+#define PPS_DIV_2_PHASE_1  0x65
+#define PPS_DIV_2_PHASE_2  0x66
+#define PPS_DIV_2_PHASE_3  0x67
+#define PPS_DIV_2_WIDTH    0x68
+#define PPS_DIV_2_START    0x69
+#define PPS_DIV_2_STOP     0x6A
+
+//PPS DIVIDER 3
+#define PPS_DIV_3_PER_TRUE 0x6B
+#define PPS_DIV_3_DIV_NUM  0x6C
+#define PPS_DIV_3_PHASE_0  0x6D
+#define PPS_DIV_3_PHASE_1  0x6E
+#define PPS_DIV_3_PHASE_2  0x6F
+#define PPS_DIV_3_PHASE_3  0x70
+#define PPS_DIV_3_WIDTH    0x71
+#define PPS_DIV_3_START    0x72
+#define PPS_DIV_3_STOP     0x73
+
+#endif
