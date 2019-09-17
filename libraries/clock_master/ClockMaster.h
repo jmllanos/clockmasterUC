@@ -21,6 +21,7 @@ enum UserRequest
   Stop,
   Setdate,
   Setpps,
+  SetChannels,
   Read,
   Write,
   ChangeIP,
@@ -51,9 +52,8 @@ class ClockMaster : public network
   	  void set_pulsegen(char* data);
   	  void get_pulsegen_parameters(int channel);
       void set_channel_configuration();
-          
-
-  	  String reset();
+      void set_channels(char* data);
+      String reset();
 };
 
 

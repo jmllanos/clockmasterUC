@@ -38,6 +38,10 @@ UserRequest str2request (String request)
   {
       return Setpps;
   }
+  else if (request=="setchannels")
+  {
+      return SetChannels;
+  }
   else
   {
     return InvalidMethod;
@@ -62,11 +66,6 @@ WRITE_REGISTER(CH_MUX_ENABLE,0x0f,response);
   PulseGen_1.set_channel(1);
   PulseGen_2.set_channel(2);
   PulseGen_3.set_channel(3);
-
-  PulseGen_0.set_parameters();
-  PulseGen_1.set_parameters();
-  PulseGen_2.set_parameters();
-  PulseGen_3.set_parameters();
 }
 
 void ClockMaster::set_divider(char* data)
@@ -77,24 +76,24 @@ void ClockMaster::set_divider(char* data)
   switch(tmp.get_channel())
   {
      case 0:
+   	DEBUG_CM_PRINTLN("Setting pps divider Nº0 parameters");
      	divider_0=tmp;     	
 	divider_0.set_parameters();
-   	DEBUG_CM_PRINTLN("Set pps divider 0 parameters");
    	break;
      case 1:
+   	DEBUG_CM_PRINTLN("Setting pps divider Nº1 parameters");
      	divider_1=tmp;
      	divider_1.set_parameters();
-   	DEBUG_CM_PRINTLN("Set pps divider 1 parameters");
    	break;    
      case 2:
+   	DEBUG_CM_PRINTLN("Setting pps divider Nº2 parameters");
      	divider_2=tmp;
      	divider_2.set_parameters();
-   	DEBUG_CM_PRINTLN("Set pps divider 2 parameters");
      	break;
      case 3:
+   	DEBUG_CM_PRINTLN("Setting pps divider Nº3 parameters");
      	divider_3=tmp;
      	divider_3.set_parameters();
-   	DEBUG_CM_PRINTLN("Set pps divider 3 parameters");
      	break;
   }
   
@@ -135,25 +134,26 @@ void ClockMaster::get_pulsegen_parameters(int channel)
   switch(channel)
   {
    case 0: 
-	DEBUG_CM_PRINTLN("Pulse Generator 0 parameters: ");
+	DEBUG_CM_PRINTLN("Pulse Generator Nº0 parameters: ");
    	PulseGen_0.get_parameters();
     break;
 
    case 1: 
-    	DEBUG_CM_PRINTLN("Pulse Generator 1 parameters: ");
+    	DEBUG_CM_PRINTLN("Pulse Generator Nº1 parameters: ");
    	PulseGen_1.get_parameters();
     break;
 
    case 2: 
-   	DEBUG_CM_PRINTLN("Pulse Generator 2 parameters: ");
+   	DEBUG_CM_PRINTLN("Pulse Generator Nº2 parameters: ");
    	PulseGen_2.get_parameters();
     break;
 
    case 3: 
-   	DEBUG_CM_PRINTLN("Pulse Generator 3 parameters: ");
+   	DEBUG_CM_PRINTLN("Pulse Generator Nº3 parameters: ");
    	PulseGen_3.get_parameters();
     break;
   }
+  DEBUG_CM_PRINTLN("***************************************************");
 }
 
 
@@ -161,33 +161,41 @@ void ClockMaster::set_pulsegen(char* data)
 {
   PulseGenerator tmp;    
   tmp.get_user_parameters(data);
+  
   DEBUG_CM_PRINTLN("***************************************************");
   switch(tmp.get_channel())
   {
      case 0:
-    PulseGen_0=tmp;     	
-	PulseGen_0.set_parameters();
-   	DEBUG_CM_PRINTLN("Set pulse generator 0 parameters");
+         DEBUG_CM_PRINTLN("Setting pulse generator Nº0 parameters");
+         PulseGen_0=tmp;     	
+         PulseGen_0.set_parameters();
+   	
    	break;
      case 1:
+    	DEBUG_CM_PRINTLN("Setting pulse generator Nº1 parameters");
      	PulseGen_1=tmp;
      	PulseGen_1.set_parameters();
-   	DEBUG_CM_PRINTLN("Set pulse generator 1 parameters");
+   
    	break;    
      case 2:
+       	DEBUG_CM_PRINTLN("Setting pulse generator Nº2 parameters");
      	PulseGen_2=tmp;
      	PulseGen_2.set_parameters();
-   	DEBUG_CM_PRINTLN("Set pulse generator 2 parameters");
      	break;
      case 3:
+    	DEBUG_CM_PRINTLN("Setting pulse generator Nº3 parameters");
      	PulseGen_3=tmp;
      	PulseGen_3.set_parameters();
-   	DEBUG_CM_PRINTLN("Set pulse generator 3 parameters");
      	break;
   }
   
+  DEBUG_CM_PRINTLN("***************************************************");
 }
 
+void ClockMaster::set_channels(char* data)
+{
+    
+}
 
 String ClockMaster::reset()
 {

@@ -18,9 +18,8 @@
 #include <EEPROM.h>
 
 #include <TIVAConfiguration.h>
-#include <read_write_registers.h>
 #include <ClockMaster.h>
-#include <network.h>
+
 
 
 //###################################################
@@ -91,19 +90,20 @@ void loop()
   }
 
   client = server.available();
-
-  DEBUG_CM_PRINTLN(client);
-  
+   
   if (client.connected())
   { 
     // Connected to client. Allocate and initialize StreamHttpRequest object.
     ArduinoHttpServer::StreamHttpRequest<80000> httpRequest(client);
     ArduinoHttpServer::StreamHttpReply httpReply(client, "application/json");
-
     
+   
+     
+    String error_message;
     // Parse the request
     if (httpRequest.readRequest())
     {
+      
       // Retrieve 2nd part of HTTP resource.
       // E.g.: "on" from "/api/sensors/on"
       char* data = (char*) httpRequest.getBody();
@@ -150,9 +150,13 @@ void loop()
           case Reset:
    
             break;
+          case SetChannels:
             
+            break;         
           case Setdate:
-          clock_master.set_pulsegen(data); 
+            
+            clock_master.set_pulsegen(data); 
+            httpReply.send("{\"setdate\":\"ok\"}");
             break;
                                
           case Setpps:
