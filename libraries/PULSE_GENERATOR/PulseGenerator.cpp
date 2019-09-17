@@ -1,66 +1,109 @@
-#ifndef _PULSE_GENERATOR_H_
-#define _PULSE_GENERATOR_H_
-
-#include<Arduino.h>
-#include<ClockMasterRegisters.h>
-#include<read_write_registers.h>
-#include<ArduinoJson.h>
-
-class PulseGenerator
-{
-    private:
-        byte enable_addr;
-        byte usr_year_h_addr;
-        byte usr_year_l_addr;
-        byte usr_month_addr;
-        byte usr_day_addr;
-        byte usr_hour_addr;
-        byte usr_minutes_addr;
-        byte usr_seconds_addr;
-        byte usr_width_high_3_addr;
-        byte usr_width_high_2_addr;
-        byte usr_width_high_1_addr;
-        byte usr_width_high_0_addr;
-        byte usr_width_period_3_addr;
-        byte usr_width_period_2_addr;
-        byte usr_width_period_1_addr;
-        byte usr_width_period_0_addr;
-        
-        byte enable;
-        byte year;
-        byte month;
-        byte day;
-        byte hour;
-        byte minutes;
-        byte seconds;
-        long width;
-        long width_period;
-        int channel;
-        
-        void set_registers();
-        
-    public:
-        void set_parameters();
-        void set_channel(int _channel);
-        
-
-};
+#include<PulseGenerator.h>
 
 void PulseGenerator::set_channel(int _channel)
 {
- channel=_channel;
+ channel= _channel;
+
+ set_registers();
+}
+
+int PulseGenerator::get_channel()
+{
+ return channel;
+}
+
+
+void PulseGenerator::get_user_parameters(char* data)
+{
+  StaticJsonBuffer<400> jsonBuffer;
+  JsonObject& pulsegen_data = jsonBuffer.parseObject(data);
+  
+  enable       = pulsegen_data["enable"];
+  usr_year     = pulsegen_data["year"];
+  usr_month    = pulsegen_data["month"];
+  usr_day      = pulsegen_data["day"];
+  usr_hour     = pulsegen_data["hour24"];
+  usr_minutes  = pulsegen_data["minute"];
+  usr_seconds  = pulsegen_data["second"];
+  
+  usr_width        = pulsegen_data["widthPulse"];
+  usr_width_period = pulsegen_data["period"];
+  
+  channel   = pulsegen_data["channel"];
+  
+  set_registers();
+  
 }
 
 void PulseGenerator::set_parameters()
 {    
     byte response[3];
+    byte usr_year_h = usr_year>>8;
+    byte usr_year_l = usr_year;
+    
+   
+    WRITE_REGISTER(usr_year_h_addr,usr_year_h,response);
+
+    WRITE_REGISTER(usr_year_l_addr,usr_year_l,response);
+
+    WRITE_REGISTER(usr_month_addr,usr_month,response);
+
+    WRITE_REGISTER(usr_day_addr,usr_day,response);		
+
+    WRITE_REGISTER(usr_hour_addr,usr_hour,response);
+
+    WRITE_REGISTER(usr_minutes_addr,usr_minutes,response);
+
+    WRITE_REGISTER(usr_seconds_addr,usr_seconds,response);
+   
     WRITE_REGISTER(enable_addr,enable,response);
-           
+
+    get_parameters();
+ 
+}
+
+void PulseGenerator::get_parameters()
+{
+    
+    byte response[3];
+    int _usr_year;
+
+    READ_REGISTER(enable_addr,response);
+    
+    READ_REGISTER(usr_year_l_addr,response);
+    _usr_year=response[1];
+
+    READ_REGISTER(usr_year_h_addr,response);
+    _usr_year=(response[1]<<8) | _usr_year;    
+    
+    DEBUG_CM_PRINTLN("USER YEAR: ");
+    DEBUG_CM_PRINTLN(_usr_year);
+    
+    READ_REGISTER(usr_month_addr,response);
+    DEBUG_CM_PRINTLN("USER MONTH: ");
+    DEBUG_CM_PRINTLN(response[1]);
+
+    READ_REGISTER(usr_day_addr,response);		
+    DEBUG_CM_PRINTLN("USER DAY: ");
+    DEBUG_CM_PRINTLN(response[1]); 
+   
+    READ_REGISTER(usr_hour_addr,response);
+    DEBUG_CM_PRINTLN("USER HOUR: ");
+    DEBUG_CM_PRINTLN(response[1]);
+    
+    READ_REGISTER(usr_minutes_addr,response);
+    DEBUG_CM_PRINTLN("USER MINUTE: ");
+    DEBUG_CM_PRINTLN(response[1]);
+    
+    READ_REGISTER(usr_seconds_addr,response);
+    DEBUG_CM_PRINTLN("USER SECOND: ");
+    DEBUG_CM_PRINTLN(response[1]);
+
 }
 
 void PulseGenerator::set_registers()
 {
-  switch(channel)
+   switch(channel)
 	  { 
 	  case 0:
 		enable_addr             =PG0_PULSE_ENA;
@@ -137,12 +180,7 @@ void PulseGenerator::set_registers()
 		usr_width_period_1_addr =PG3_WIDTH_PERIOD_1;
 		usr_width_period_0_addr =PG3_WIDTH_PERIOD_0;
 	   break;
-	  
-	  
+	    
 	  }
   
-}
-
-
-
-#endif
+} 
