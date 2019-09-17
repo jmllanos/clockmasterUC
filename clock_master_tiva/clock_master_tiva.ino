@@ -4,7 +4,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <string.h>
-#include "WatchdogMan.h"
+//#include "WatchdogMan.h"
 #include "Energia.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
@@ -19,10 +19,9 @@
 
 #include <TIVAConfiguration.h>
 #include <read_write_registers.h>
-#include <PPSDivider.h>
 #include <ClockMaster.h>
 #include <network.h>
-#include <PULSE_GENERATOR.h>
+
 
 //###################################################
 uint32_t invalid = 0;//bool
@@ -40,17 +39,17 @@ bool change_ip_flag = false;
 
 EthernetServer server(SERVER_PORT);
 EthernetClient client;
-byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+byte mac[] = {0x08, 0x00,0x28,0x5A,0x83,0xFE};
 byte response[] = {0x0, 0x0, 0x0};
 
 volatile uint8_t state = 0;
 
-ClockMaster master;
+ClockMaster clock_master;
 //***********************************************
 
 void setup()
 {
-  ConfigWatchDog(ncycles_WDT);
+ // ConfigWatchDog(ncycles_WDT);
 
   DEBUG_CM_BEGIN(BAUD_RATE);
   DEBUG_CM_PRINTLN("Serial started.");
@@ -61,43 +60,46 @@ void setup()
   
   //revisar!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  master.NETWORK_INIT_CONFIG();
+  clock_master.NETWORK_INIT_CONFIG();
 
-  INIT_I2C();
+//  INIT_I2C();
 
   INIT_SPI();
 
-  master.START_ETH(mac, server);
+  clock_master.START_ETH(mac, server);
 
   initTimer(1); // timer a 0.5 hz..................
 
   pinMode(buttonPin, INPUT_PULLUP);
 
-  ResetWatchDogTimer(ncycles_WDT);
+  //ResetWatchDogTimer(ncycles_WDT);
 
+  clock_master.init();
 }
 
 
 void loop()
 {
-  ResetWatchDogTimer(ncycles_WDT);
+   //ResetWatchDogTimer(ncycles_WDT);
 
-  TEST_WATCHDOG();
+  //TEST_WATCHDOG();
 
   if(change_ip_flag)
   {
+    clock_master.UPDATE_ETH_CONFIG();
     change_ip_flag=false;
   }
 
   client = server.available();
 
+  DEBUG_CM_PRINTLN(client);
+  
   if (client.connected())
-  {
+  { 
     // Connected to client. Allocate and initialize StreamHttpRequest object.
     ArduinoHttpServer::StreamHttpRequest<80000> httpRequest(client);
     ArduinoHttpServer::StreamHttpReply httpReply(client, "application/json");
-   
-    String http_response;
+
     
     // Parse the request
     if (httpRequest.readRequest())
@@ -116,6 +118,7 @@ void loop()
       DEBUG_CM_PRINTLN(data);
       DEBUG_CM_PRINTLN();
 
+     
       // Retrieve HTTP method.
       // E.g.: GET / PUT / HEAD / DELETE /ip[3]=ip_data["ip"][3];
       ArduinoHttpServer::MethodEnum method( ArduinoHttpServer::MethodInvalid);
@@ -129,7 +132,7 @@ void loop()
           case Status:
            
             break;
-          case Error:
+          case InvalidMethod:
             DEBUG_CM_PRINTLN("********************************************");
             ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
             httpReply.send(httpRequest.getErrorDescrition());
@@ -145,30 +148,35 @@ void loop()
         switch (str2request(httpRequest.getResource()[0]))
         {
           case Reset:
-            http_response=master.reset();
-            httpReply.send(http_response);
+   
             break;
             
-          case Start:
-           
+          case Setdate:
+          clock_master.set_pulsegen(data); 
             break;
-            
-          case Stop:
-            
-            break;
-            
+                               
           case Setpps:
-           master.set_divider(data); 
+           clock_master.set_divider(data); 
                        
            break;
           case ChangeIP:
           
-            http_response=master.CHANGE_IP(data);
-            httpReply.send(http_response);
-           
+            change_ip_flag=clock_master.CHANGE_IP(data);
+            if(change_ip_flag)
+            {
+              httpReply.send("{\"changeip\":\"ok\"}"); 
+            }
+            else
+            {
+              DEBUG_CM_PRINTLN("********************************************");
+              ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
+              httpReply.send(httpRequest.getErrorDescrition());
+              DEBUG_CM_PRINTLN("WRONG IP DATA!!");
+              DEBUG_CM_PRINTLN("********************************************");
+            }           
             break;
           
-          case Error:
+          case InvalidMethod:
             DEBUG_CM_PRINTLN("********************************************");
             ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
             httpReply.send(httpRequest.getErrorDescrition());
@@ -193,6 +201,10 @@ void loop()
   }
 
   client.stop();
+
+ 
+ 
+ delay(1000);
 
 }
 

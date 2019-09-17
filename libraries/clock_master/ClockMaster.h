@@ -1,12 +1,16 @@
 #ifndef _cl_h_
 #define _cl_h_
+
 #include<Arduino.h>
 #include<ClockMasterRegisters.h>
 #include<TIVAConfiguration.h>
-#include<PPSDivider.h>
-#include<network.h>
 #include<ArduinoHttpServer.h>
 #include<string.h>
+
+#include<network.h>
+#include<PulseGenerator.h>
+#include<PPSDivider.h>
+#include<read_write_registers.h>
 
 
 enum UserRequest
@@ -20,7 +24,7 @@ enum UserRequest
   Read,
   Write,
   ChangeIP,
-  Error
+  InvalidMethod
 };
 
 UserRequest str2request (String request);
@@ -33,14 +37,23 @@ class ClockMaster : public network
           PPSDivider divider_1;
           PPSDivider divider_2;
           PPSDivider divider_3;
+
+          PulseGenerator PulseGen_0;
+          PulseGenerator PulseGen_1;
+          PulseGenerator PulseGen_2;
+          PulseGenerator PulseGen_3;
              
     public:
-  	  ClockMaster();
-  	  void set_divider(char* data);
+  	  
+  	  void init();
+      void set_divider(char* data);
   	  void get_divider_parameters(int channel);
-  	  String reset();
-    
+  	  void set_pulsegen(char* data);
+  	  void get_pulsegen_parameters(int channel);
+      void set_channel_configuration();
+          
 
+  	  String reset();
 };
 
 

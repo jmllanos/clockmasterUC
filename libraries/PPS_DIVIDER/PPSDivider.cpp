@@ -39,22 +39,38 @@ void PPSDivider::set_parameters()
 void PPSDivider::get_parameters()
 {    
     byte response[3];
+    
     READ_REGISTER(per_true_addr,response);
-           
+    DEBUG_CM_PRINTLN("per_true");
+    DEBUG_CM_PRINTLN(response[1]);       
+    
     READ_REGISTER(divider_addr,response);
-   
+    DEBUG_CM_PRINTLN("Divider");
+    DEBUG_CM_PRINTLN(response[1]);       
+    
     READ_REGISTER(phase_0_addr,response);
+    DEBUG_CM_PRINTLN("phase 0");
+    DEBUG_CM_PRINTLN(response[1]);       
     
     READ_REGISTER(phase_1_addr,response);
+    DEBUG_CM_PRINTLN("phase 1");
+    DEBUG_CM_PRINTLN(response[1]);       
     
     READ_REGISTER(phase_2_addr,response);
+    DEBUG_CM_PRINTLN("phase 2");
+    DEBUG_CM_PRINTLN(response[1]);       
     
     READ_REGISTER(width_addr,response);
+    DEBUG_CM_PRINTLN("phase 3");
+    DEBUG_CM_PRINTLN(response[1]);       
     
     READ_REGISTER(start_addr,response);
+    DEBUG_CM_PRINTLN("start ");
+    DEBUG_CM_PRINTLN(response[1]);       
     
     READ_REGISTER(stop_addr,response);
-
+    DEBUG_CM_PRINTLN("stop");
+    DEBUG_CM_PRINTLN(response[1]);       
 }
 
 
@@ -87,7 +103,8 @@ switch(channel)
 		phase_2_addr =PPS_DIV_0_PHASE_2 ; 
                 width_addr   =PPS_DIV_0_WIDTH;    
 		start_addr   =PPS_DIV_0_START;   
-		stop_addr    =PPS_DIV_0_STOP ;    
+		stop_addr    =PPS_DIV_0_STOP ;
+                 break;    
 	  case 1:
 		per_true_addr=PPS_DIV_1_PER_TRUE; 
 		divider_addr =PPS_DIV_1_DIV_NUM ;
@@ -96,7 +113,8 @@ switch(channel)
 		phase_2_addr =PPS_DIV_1_PHASE_2 ; 
                 width_addr   =PPS_DIV_1_WIDTH;    
 		start_addr   =PPS_DIV_1_START;   
-		stop_addr    =PPS_DIV_1_STOP ;    
+		stop_addr    =PPS_DIV_1_STOP ;
+                 break;    
 	  case 2:
 		per_true_addr=PPS_DIV_2_PER_TRUE; 
 		divider_addr =PPS_DIV_2_DIV_NUM ;
@@ -105,7 +123,8 @@ switch(channel)
 		phase_2_addr =PPS_DIV_2_PHASE_2 ; 
                 width_addr   =PPS_DIV_2_WIDTH;    
 		start_addr   =PPS_DIV_2_START;   
-		stop_addr    =PPS_DIV_2_STOP ;    
+		stop_addr    =PPS_DIV_2_STOP ;
+                 break;    
 	  case 3:
 		per_true_addr=PPS_DIV_3_PER_TRUE; 
 		divider_addr =PPS_DIV_3_DIV_NUM ;
@@ -114,7 +133,8 @@ switch(channel)
 		phase_2_addr =PPS_DIV_3_PHASE_2 ; 
 	        width_addr   =PPS_DIV_3_WIDTH;    
 		start_addr   =PPS_DIV_3_START;   
-		stop_addr    =PPS_DIV_3_STOP ;    
+		stop_addr    =PPS_DIV_3_STOP ;   
+                 break; 
 
 	} 
 

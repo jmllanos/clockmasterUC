@@ -21,31 +21,51 @@ bool network::CHECK_VALID_IP()
   bool network_10_x_x_x     =false;
   bool network_172_16_x_x   =false;
   bool network_192_168_x_x  =false;
-  bool ip_valid=false;
+
+  bool gateway_valid=false;
+  bool ip_valid     =false;
+  bool valid_network=false;
 
   network_10_x_x_x= new_ip[0]      == 10  &&
-		    new_dns[0]     == 10  &&
-		    new_gateway[0] == 10;
+                    new_dns[0]     == 10  &&
+                    new_gateway[0] == 10;
 
   network_172_16_x_x= new_ip[0]      == 172 &&
-		      new_ip[1]      == 16  &&
-		      new_dns[0]     == 172 &&
-		      new_dns[1]     == 16  &&
-		      new_gateway[0] == 172 &&
-		      new_gateway[1] == 16 ;
+                      new_ip[1]      == 16  &&
+                      new_dns[0]     == 172 &&
+                      new_dns[1]     == 16  &&
+                      new_gateway[0] == 172 &&
+                      new_gateway[1] == 16 ;
 
   network_192_168_x_x = new_ip[0]       == 192 &&
-		        new_ip[1]       == 168 &&
-		        new_dns[0]      == 192 &&
-		        new_dns[1]      == 168 &&
-		        new_gateway[0]  == 192 &&
-		        new_gateway[1]  == 168 ;
+                        new_ip[1]       == 168 &&
+                        new_dns[0]      == 192 &&
+                        new_dns[1]      == 168 &&
+                        new_gateway[0]  == 192 &&
+                        new_gateway[1]  == 168 ;
 
-  ip_valid= network_10_x_x_x    ||
-	    network_172_16_x_x  ||
-	    network_192_168_x_x;
+ ip_valid = network_10_x_x_x    ||
+            network_172_16_x_x  ||
+            network_192_168_x_x;
+  
+  
+ gateway_valid =(new_ip[0]&new_subnet[0])==(new_gateway[0] & new_subnet[0])&&
+	        (new_ip[1]&new_subnet[1])==(new_gateway[1] & new_subnet[1])&&
+                (new_ip[2]&new_subnet[2])==(new_gateway[2] & new_subnet[2])&&
+                (new_ip[3]&new_subnet[3])==(new_gateway[3] & new_subnet[3]);
 
-  return ip_valid;
+ valid_network= ip_valid && gateway_valid;
+
+ DEBUG_CM_PRINTLN("Print gateway : ");
+ DEBUG_CM_PRINTLN(new_gateway);  
+ 
+ DEBUG_CM_PRINTLN("Print ip : ");
+ DEBUG_CM_PRINTLN(new_ip);  
+
+ DEBUG_CM_PRINTLN("Print valid network : ");
+ DEBUG_CM_PRINTLN(valid_network);  
+
+  return valid_network;
 }
 
 void network::STORE_IP()
@@ -78,10 +98,10 @@ void network::LOAD_IP()
   new_ip[2]=EEPROM.read(IP_2_ADD),
   new_ip[3]=EEPROM.read(IP_3_ADD);
 
-  new_dns[0]=EEPROM.read(IP_0_ADD),
-  new_dns[1]=EEPROM.read(IP_1_ADD),
-  new_dns[2]=EEPROM.read(IP_2_ADD),
-  new_dns[3]=EEPROM.read(IP_3_ADD);
+  new_dns[0]=EEPROM.read(DNS_0_ADD),
+  new_dns[1]=EEPROM.read(DNS_1_ADD),
+  new_dns[2]=EEPROM.read(DNS_2_ADD),
+  new_dns[3]=EEPROM.read(DNS_3_ADD);
 
   new_gateway[0]=EEPROM.read(GATEWAY_0_ADD),
   new_gateway[1]=EEPROM.read(GATEWAY_1_ADD),
@@ -109,10 +129,10 @@ void network::GET_USER_IP(char* data)
   new_dns[2]=network_data["dns"][2];
   new_dns[3]=network_data["dns"][3];
 
-  new_gateway[1]=network_data["gateway"][0];
-  new_gateway[2]=network_data["gateway"][1];
-  new_gateway[3]=network_data["gateway"][2];
-  new_gateway[4]=network_data["gateway"][3];
+  new_gateway[0]=network_data["gateway"][0];
+  new_gateway[1]=network_data["gateway"][1];
+  new_gateway[2]=network_data["gateway"][2];
+  new_gateway[3]=network_data["gateway"][3];
 
   new_subnet[0]=network_data["subnet"][0];
   new_subnet[1]=network_data["subnet"][1];
@@ -141,9 +161,9 @@ void network::NETWORK_INIT_CONFIG()
       delay(100);
 }
 	
-String network::CHANGE_IP(char* data)
+bool network::CHANGE_IP(char* data)
 {
- String http_reply;
+ bool change_ip_flag=false;
  
  DEBUG_CM_PRINTLN("***************************************************");
  DEBUG_CM_PRINTLN("Changing IP data...");
@@ -153,34 +173,35 @@ String network::CHANGE_IP(char* data)
  if(CHECK_VALID_IP())
  {
   DEBUG_CM_PRINTLN("New Ethernet configuration received.");
-  http_reply="{\"changeip\":\"ok\"}"; 
- 
+  
   ip=new_ip;
   dns=new_dns;
   gateway=new_gateway;
   subnet=new_subnet;
   
   STORE_IP();
- }
- else
- {
-  http_reply="{\"changeip\":\"invalid\"}";
+  change_ip_flag=true;
  }
  
- DEBUG_CM_PRINTLN("Wrong IP data.");
- 
- return http_reply; 
+ return change_ip_flag; 
 }
 
 
 void network::UPDATE_ETH_CONFIG()
 {
-  LOAD_IP();
-
   DEBUG_CM_PRINTLN("Changing Ethernet configuration.");
   Ethernet.setStaticIP(ip, gateway, subnet);
   DEBUG_CM_PRINTLN("Ethernet connection ready.");
   DEBUG_CM_PRINT("Server is at ");
   DEBUG_CM_PRINTLN(Ethernet.localIP());
+
+  DEBUG_CM_PRINTLN("ip :");
+  DEBUG_CM_PRINTLN(ip);    
+  DEBUG_CM_PRINTLN("gateway :");
+  DEBUG_CM_PRINTLN(gateway);
+  DEBUG_CM_PRINTLN("subnet :");
+  DEBUG_CM_PRINTLN(subnet);    
+
+  
 }
 
