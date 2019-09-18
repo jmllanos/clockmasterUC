@@ -161,7 +161,7 @@ void loop()
                                
           case Setpps:
            clock_master.set_divider(data); 
-                       
+           httpReply.send("{\"setpps\":\"ok\"}");            
            break;
           case ChangeIP:
           
@@ -206,8 +206,8 @@ void loop()
 
   client.stop();
 
- 
- 
+ //clock_master.thunder.read_time();
+ clock_master.get_divider_parameters(0);
  delay(1000);
 
 }
@@ -248,8 +248,9 @@ void INIT_SPI()
 {
   SPI.setModule(4);
   SPI.setBitOrder(MSBFIRST);
-  SPI.begin();
   SPI.setClockDivider(30);
+  SPI.begin();
+  
 }
 
 void INIT_I2C()

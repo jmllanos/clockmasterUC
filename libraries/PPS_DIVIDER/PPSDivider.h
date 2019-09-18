@@ -24,14 +24,14 @@ private:
    byte width;
    byte start;
    byte stop;
-   byte channel;
+   int channel;
 
 public:
   void set_parameters();
   void get_parameters();
   void set_channel(int _channel); 
   void get_user_parameters(char* data);
-  byte get_channel();
+  int get_channel();
   void set_registers();
   
 };

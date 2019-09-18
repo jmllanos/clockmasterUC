@@ -103,8 +103,7 @@ void PulseGenerator::get_parameters()
     byte response[3];
     int _usr_year;
 
-    READ_REGISTER(enable_addr,response);
-    
+        
     READ_REGISTER(usr_year_l_addr,response);
     _usr_year=response[1];
 
@@ -133,6 +132,10 @@ void PulseGenerator::get_parameters()
     READ_REGISTER(usr_seconds_addr,response);
     DEBUG_CM_PRINTLN("USER SECOND: ");
     DEBUG_CM_PRINTLN(response[1]);
+   
+    READ_REGISTER(enable_addr,response);
+     DEBUG_CM_PRINTLN("Enable status: ");
+    DEBUG_CM_PRINTLN(response[1]);
 
 }
 
@@ -157,6 +160,8 @@ void PulseGenerator::set_registers()
 		usr_width_period_2_addr =PG0_WIDTH_PERIOD_2;
 		usr_width_period_1_addr =PG0_WIDTH_PERIOD_1;
 		usr_width_period_0_addr =PG0_WIDTH_PERIOD_0;
+
+        DEBUG_CM_PRINTLN("Set to channel 0");
 	   break;
 	         
 	  case 1:
@@ -176,6 +181,8 @@ void PulseGenerator::set_registers()
 		usr_width_period_2_addr =PG1_WIDTH_PERIOD_2;
 		usr_width_period_1_addr =PG1_WIDTH_PERIOD_1;
 		usr_width_period_0_addr =PG1_WIDTH_PERIOD_0;
+        
+        DEBUG_CM_PRINTLN("Set to channel 1");
 	   break;
 
 	  case 2:
@@ -195,6 +202,8 @@ void PulseGenerator::set_registers()
 		usr_width_period_2_addr =PG2_WIDTH_PERIOD_2;
 		usr_width_period_1_addr =PG2_WIDTH_PERIOD_1;
 		usr_width_period_0_addr =PG2_WIDTH_PERIOD_0;
+        
+        DEBUG_CM_PRINTLN("Set to channel 2");
 	   break;
 	  
 	  case 3:
@@ -214,8 +223,13 @@ void PulseGenerator::set_registers()
 		usr_width_period_2_addr =PG3_WIDTH_PERIOD_2;
 		usr_width_period_1_addr =PG3_WIDTH_PERIOD_1;
 		usr_width_period_0_addr =PG3_WIDTH_PERIOD_0;
+        
+        DEBUG_CM_PRINTLN("Set to channel 3");
 	   break;
-	    
+	   
+      default:
+        DEBUG_CM_PRINTLN("Invalid channel");
+
 	  }
   
 } 
