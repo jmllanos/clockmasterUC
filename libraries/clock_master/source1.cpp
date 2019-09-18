@@ -1,61 +1,18 @@
 #include<ClockMaster.h>
 
-UserRequest str2request (String request)
-{
-  if (request == "reset")
-  {
-    return Reset;
-  }
-  else if (request == "start")
-  {
-    return Start;
-  }
-  else if (request == "stop")
-  {
-    return Stop;
-  }
-  else if (request == "read")
-  {
-    return Read;
-  }
-  else if (request == "write")
-  {
-    return Write;
-  }
-  else if (request == "changeip")
-  {
-    return ChangeIP;
-  }
-  else if (request == "status")
-  {
-    return Status;
-  }
-  else if(request== "setdate")
-  {
-      return Setdate;
-  }
-  else if (request=="setpps")
-  {
-      return Setpps;
-  }
-  else if (request=="setchannels")
-  {
-      return SetChannels;
-  }
-  else
-  {
-    return InvalidMethod;
-  }
-
-}
-
 // CLOCK MASTER CLASS
 void ClockMaster::init()
 {
-    byte response[0];
-WRITE_REGISTER(CH_MUX_SELECTOR,0x0f,response);
+    byte response[3];
+   WRITE_REGISTER(CH_MUX_SELECTOR,0x00,response);
+   READ_REGISTER(CH_MUX_SELECTOR,response);
+   DEBUG_CM_PRINTLN("MUX SELECTOR");
+   DEBUG_CM_PRINTLN2(response[1],HEX);
 
-WRITE_REGISTER(CH_MUX_ENABLE,0x0f,response);
+   WRITE_REGISTER(CH_MUX_ENABLE,0xff,response);
+   READ_REGISTER(CH_MUX_ENABLE,response);
+   DEBUG_CM_PRINTLN("MUX ENABLE");
+   DEBUG_CM_PRINTLN2(response[1],HEX);
 
   divider_0.set_channel(0);
   divider_1.set_channel(1);
@@ -78,7 +35,7 @@ void ClockMaster::set_divider(char* data)
      case 0:
    	DEBUG_CM_PRINTLN("Setting pps divider Nº0 parameters");
      	divider_0=tmp;     	
-	divider_0.set_parameters();
+     	divider_0.set_parameters();
    	break;
      case 1:
    	DEBUG_CM_PRINTLN("Setting pps divider Nº1 parameters");
@@ -95,6 +52,7 @@ void ClockMaster::set_divider(char* data)
      	divider_3=tmp;
      	divider_3.set_parameters();
      	break;
+  DEBUG_CM_PRINTLN("***************************************************");
   }
   
 }
@@ -105,22 +63,22 @@ void ClockMaster::get_divider_parameters(int channel)
   switch(channel)
   {
    case 0: 
-	DEBUG_CM_PRINTLN("Get pps divider 0 parameters");
+	DEBUG_CM_PRINTLN("PPS divider Nº0 parameters :");
    	divider_0.get_parameters();
     break;
 
    case 1: 
-    	DEBUG_CM_PRINTLN("Get pps divider 1 parameters");
+    DEBUG_CM_PRINTLN("PPS divider Nº1 parameters :");
    	divider_1.get_parameters();
     break;
 
    case 2: 
-   	DEBUG_CM_PRINTLN("Get pps divider 2 parameters");
+   	DEBUG_CM_PRINTLN("PPS divider Nº2 parameters :");
    	divider_2.get_parameters();
     break;
 
    case 3: 
-   	DEBUG_CM_PRINTLN("Get pps divider 3 parameters");
+   	DEBUG_CM_PRINTLN("PPS divider Nº3 parameters :");
    	divider_3.get_parameters();
     break;
   }
@@ -139,7 +97,7 @@ void ClockMaster::get_pulsegen_parameters(int channel)
     break;
 
    case 1: 
-    	DEBUG_CM_PRINTLN("Pulse Generator Nº1 parameters: ");
+   	DEBUG_CM_PRINTLN("Pulse Generator Nº1 parameters: ");
    	PulseGen_1.get_parameters();
     break;
 

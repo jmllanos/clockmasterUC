@@ -31,6 +31,16 @@ enum UserRequest
 UserRequest str2request (String request);
 
 
+class thunderbolt
+{
+    private:
+
+    public:
+    void read_time();
+};
+
+
+
 class ClockMaster : public network
 {
     private:
@@ -43,9 +53,11 @@ class ClockMaster : public network
           PulseGenerator PulseGen_1;
           PulseGenerator PulseGen_2;
           PulseGenerator PulseGen_3;
+
              
     public:
   	  
+      thunderbolt thunder;
   	  void init();
       void set_divider(char* data);
   	  void get_divider_parameters(int channel);
@@ -55,6 +67,7 @@ class ClockMaster : public network
       void set_channels(char* data);
       String reset();
 };
+
 
 
 #endif
