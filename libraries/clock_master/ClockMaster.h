@@ -54,7 +54,8 @@ class ClockMaster : public network
           PulseGenerator PulseGen_2;
           PulseGenerator PulseGen_3;
 
-             
+           byte channels_mux_enable;
+           byte channels_mux_selector;
     public:
   	  
       thunderbolt thunder;
@@ -64,7 +65,7 @@ class ClockMaster : public network
   	  void set_pulsegen(char* data);
   	  void get_pulsegen_parameters(int channel);
       void set_channel_configuration();
-      void set_channels(char* data);
+      void set_channels_muxes(char* data);
       String reset();
 };
 

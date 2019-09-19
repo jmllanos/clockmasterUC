@@ -9,7 +9,7 @@ void ClockMaster::init()
    DEBUG_CM_PRINTLN("MUX SELECTOR");
    DEBUG_CM_PRINTLN2(response[1],HEX);
 
-   WRITE_REGISTER(CH_MUX_ENABLE,0xff,response);
+   WRITE_REGISTER(CH_MUX_ENABLE,0x00,response);
    READ_REGISTER(CH_MUX_ENABLE,response);
    DEBUG_CM_PRINTLN("MUX ENABLE");
    DEBUG_CM_PRINTLN2(response[1],HEX);
@@ -150,10 +150,6 @@ void ClockMaster::set_pulsegen(char* data)
   DEBUG_CM_PRINTLN("***************************************************");
 }
 
-void ClockMaster::set_channels(char* data)
-{
-    
-}
 
 String ClockMaster::reset()
 {
@@ -180,5 +176,25 @@ return reply;
 }
 
 
+void ClockMaster::set_channels_muxes(char* data)
+{
+  StaticJsonBuffer<400> jsonBuffer;
+  JsonObject& channels_muxes_data = jsonBuffer.parseObject(data);
+  
+channels_mux_enable = (byte)channels_muxes_data["channelEnable"][0];
+channels_mux_selector  = (byte)channels_muxes_data["muxSelector"][0];
+byte response[3];
+WRITE_REGISTER(CH_MUX_SELECTOR,channels_mux_selector,response);
+READ_REGISTER(CH_MUX_SELECTOR,response);
+DEBUG_CM_PRINTLN("CHANNEL MUX SELECTOR");
+DEBUG_CM_PRINTLN(response[1]);
+
+
+WRITE_REGISTER(CH_MUX_ENABLE,channels_mux_enable,response);
+READ_REGISTER(CH_MUX_ENABLE,response);
+DEBUG_CM_PRINTLN("CHANNEL MUX ENABLE");
+DEBUG_CM_PRINTLN(response[1]);
+
+}
 
 

@@ -151,7 +151,8 @@ void loop()
    
             break;
           case SetChannels:
-            
+            clock_master.set_channels_muxes(data);
+            httpReply.send("{\"setchannels\":\"ok\"}");
             break;         
           case Setdate:
             
