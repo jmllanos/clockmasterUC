@@ -4,17 +4,17 @@
 #define DEBUG_RC
 
 #ifdef DEBUG_RC
-#define DEBUG_RC_BEGIN(x) Serial.begin(x)
-#define DEBUG_RC_PRINT(x) Serial.print(x)
-#define DEBUG_RC_PRINT2(x,y) Serial.print(x,y)
-#define DEBUG_RC_PRINTLN(x) Serial.println(x)
-#define DEBUG_RC_PRINTLN2(x,y) Serial.println(x,y)
+#define DEBUG_CM_BEGIN(x) Serial.begin(x)
+#define DEBUG_CM_PRINT(x) Serial.print(x)
+#define DEBUG_CM_PRINT2(x,y) Serial.print(x,y)
+#define DEBUG_CM_PRINTLN(x) Serial.println(x)
+#define DEBUG_CM_PRINTLN2(x,y) Serial.println(x,y)
 #else
-#define DEBUG_RC_BEGIN(x)
-#define DEBUG_RC_PRINT(x)
-#define DEBUG_RC_PRINT2(x,y)
-#define DEBUG_RC_PRINTLN(x)
-#define DEBUG_RC_PRINTLN2(x,y)
+#define DEBUG_CM_BEGIN(x)
+#define DEBUG_CM_PRINT(x)
+#define DEBUG_CM_PRINT2(x,y)
+#define DEBUG_CM_PRINTLN(x)
+#define DEBUG_CM_PRINTLN2(x,y)
 #endif
 
 #define BAUD_RATE 1000000
@@ -94,24 +94,5 @@
 
 // SYSTEM FREEZE COUNTER
 #define FREEZE_COUNTER_ADDR     130
-
-//************************
-// CGS configuration
-#define FREQ_INT_DEFAULT 60
-#define FREQ_DECIMAL_DEFAULT 0
-
-#define DIVIDER_DEFAULT 59
-#define MULT 72
-#define DIV  12
-#define SOURCE 1  // 1 - 10MHz, 0 - 25Mhz
-
-//**********************
-// LCD
-#define CLEAR_LCD 0
-
-// MONITOR
-#define MONITOR_SELECTOR 6
-#define MONITOR_ENABLE 1
-#define MONITOR_SETUP (MONITOR_SELECTOR << 4) + (MONITOR_ENABLE<<3)
 
 #endif

@@ -45,21 +45,10 @@ class network
   
   public:
   
-	String CHANGE_IP(char* data);
+	bool CHANGE_IP(char* data);
 	void NETWORK_INIT_CONFIG();
-	void START_ETH(byte* mas, EthernetServer& server);
-
-void UPDATE_ETH_CONFIG()
-{
-  LOAD_IP();
-
-  DEBUG_RC_PRINTLN("Changing Ethernet configuration.");
-  Ethernet.setStaticIP(ip, gateway, subnet);
-  DEBUG_RC_PRINTLN("Ethernet connection ready.");
-  DEBUG_RC_PRINT("Server is at ");
-  DEBUG_RC_PRINTLN(Ethernet.localIP());
-}
-
+	void START_ETH(byte* mac, EthernetServer& server);
+	void UPDATE_ETH_CONFIG();
 	
 };
 
