@@ -1,5 +1,5 @@
-#ifndef _cl_h_
-#define _cl_h_
+#ifndef _CLOCK_MASTER_H_
+#define _CLOCK_MASTER_H_
 
 #include<Arduino.h>
 #include<ClockMasterRegisters.h>
@@ -11,7 +11,7 @@
 #include<PulseGenerator.h>
 #include<PPSDivider.h>
 #include<read_write_registers.h>
-
+#include<string.h>
 
 enum UserRequest
 {
@@ -36,37 +36,33 @@ class thunderbolt
     private:
 
     public:
-    void read_time();
+    void readTime();
 };
-
 
 
 class ClockMaster : public network
 {
     private:
-          PPSDivider divider_0;
-          PPSDivider divider_1;
-          PPSDivider divider_2;
-          PPSDivider divider_3;
+          
+         PPSDivider PPSdiv;
+          
+         PulseGenerator PulseGen;
 
-          PulseGenerator PulseGen_0;
-          PulseGenerator PulseGen_1;
-          PulseGenerator PulseGen_2;
-          PulseGenerator PulseGen_3;
+         byte channels_mux_enable;
 
-           byte channels_mux_enable;
-           byte channels_mux_selector;
+         String ReplyMessage;
     public:
   	  
       thunderbolt thunder;
-  	  void init();
-      void set_divider(char* data);
-  	  void get_divider_parameters(int channel);
-  	  void set_pulsegen(char* data);
-  	  void get_pulsegen_parameters(int channel);
-      void set_channel_configuration();
-      void set_channels_muxes(char* data);
-      String reset();
+      void init();
+      void getStatus();
+      void start();
+      void stop();
+      void reset();
+      void setDivider(char* data);
+      void setPulsegen(char* data);
+            
+      String getReplyMessage();
 };
 
 

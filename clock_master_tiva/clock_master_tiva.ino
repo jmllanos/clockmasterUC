@@ -19,7 +19,7 @@
 
 #include <TIVAConfiguration.h>
 #include <ClockMaster.h>
-
+#include <Nokia_5110_AC2.h>
 
 
 //###################################################
@@ -49,43 +49,34 @@ ClockMaster clock_master;
 void setup()
 {
  // ConfigWatchDog(ncycles_WDT);
-
   DEBUG_CM_BEGIN(BAUD_RATE);
   DEBUG_CM_PRINTLN("Serial started.");
-  pinMode(REST_LED, OUTPUT);
-  pinMode(GEAR_LED, OUTPUT);
-  pinMode(INT_LED, OUTPUT);
-  DEBUG_CM_PRINTLN("Leds configured.");
-  
-  //revisar!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  clock_master.NETWORK_INIT_CONFIG();
-
-//  INIT_I2C();
-
+  pinMode(PL_2,OUTPUT);
+  digitalWrite(PL_2,HIGH);
+  delay(1500);
+  digitalWrite(PL_2,LOW);
+//Reset TINY FPGA
+  clock_master.NetworkInitConfig();
+//INIT_I2C();
   INIT_SPI();
-
-  clock_master.START_ETH(mac, server);
-
+  clock_master.startEth(mac, server);
   initTimer(1); // timer a 0.5 hz..................
-
   pinMode(buttonPin, INPUT_PULLUP);
-
   //ResetWatchDogTimer(ncycles_WDT);
-
-  clock_master.init();
+ clock_master.init();
 }
 
 
 void loop()
 {
+  
    //ResetWatchDogTimer(ncycles_WDT);
 
   //TEST_WATCHDOG();
 
   if(change_ip_flag)
   {
-    clock_master.UPDATE_ETH_CONFIG();
+    clock_master.updateEthConfig();
     change_ip_flag=false;
   }
 
@@ -96,8 +87,6 @@ void loop()
     // Connected to client. Allocate and initialize StreamHttpRequest object.
     ArduinoHttpServer::StreamHttpRequest<80000> httpRequest(client);
     ArduinoHttpServer::StreamHttpReply httpReply(client, "application/json");
-    
-   
      
     String error_message;
     // Parse the request
@@ -130,8 +119,10 @@ void loop()
         switch (str2request(httpRequest.getResource()[0]))
         {
           case Status:
-           
+            clock_master.getStatus();
+            httpReply.send(clock_master.getReplyMessage()); 
             break;
+          
           case InvalidMethod:
             DEBUG_CM_PRINTLN("********************************************");
             ArduinoHttpServer::StreamHttpErrorReply httpReply(client, httpRequest.getContentType());
@@ -144,29 +135,37 @@ void loop()
       }
       else if ( method == ArduinoHttpServer::MethodPost)
       {
+        
         digitalWrite(REST_LED, HIGH);
         switch (str2request(httpRequest.getResource()[0]))
-        {
+        {      
           case Reset:
-   
+          
             break;
-          case SetChannels:
-            clock_master.set_channels_muxes(data);
-            httpReply.send("{\"setchannels\":\"ok\"}");
-            break;         
-          case Setdate:
             
-            clock_master.set_pulsegen(data); 
-            httpReply.send("{\"setdate\":\"ok\"}");
+          case Start:
+            clock_master.start();
+            httpReply.send(clock_master.getReplyMessage());
+            break;
+            
+          case Stop:
+            clock_master.stop();
+            httpReply.send(clock_master.getReplyMessage());
+            break;
+                            
+          case Setdate:
+            clock_master.setPulsegen(data); 
+            httpReply.send(clock_master.getReplyMessage());
             break;
                                
           case Setpps:
-           clock_master.set_divider(data); 
-           httpReply.send("{\"setpps\":\"ok\"}");            
+           clock_master.setDivider(data); 
+            httpReply.send(clock_master.getReplyMessage());
            break;
+          
           case ChangeIP:
           
-            change_ip_flag=clock_master.CHANGE_IP(data);
+            change_ip_flag=clock_master.changeIP(data);
             if(change_ip_flag)
             {
               httpReply.send("{\"changeip\":\"ok\"}"); 
@@ -207,8 +206,6 @@ void loop()
 
   client.stop();
 
- //clock_master.thunder.read_time();
- clock_master.get_divider_parameters(0);
  delay(1000);
 
 }
@@ -251,7 +248,6 @@ void INIT_SPI()
   SPI.setBitOrder(MSBFIRST);
   SPI.setClockDivider(30);
   SPI.begin();
-  
 }
 
 void INIT_I2C()

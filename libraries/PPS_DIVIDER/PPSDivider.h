@@ -5,6 +5,7 @@
 #include<ClockMasterRegisters.h>
 #include<read_write_registers.h>
 #include<ArduinoJson.h>
+#include<string.h>
 
 class PPSDivider
 {
@@ -26,14 +27,20 @@ private:
    byte stop;
    int channel;
 
-public:
-  void set_parameters();
-  void get_parameters();
-  void set_channel(int _channel); 
+   bool SPI_OK;
+
+   String ReplyMessage;
+
   void get_user_parameters(char* data);
-  int get_channel();
+  void write_parameters(); 
   void set_registers();
+
+public:
+  void set_parameters(char* data);
+  void get_parameters();
   
+  String get_ReplyMessage();
+
 };
 
 

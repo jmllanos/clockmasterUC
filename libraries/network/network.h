@@ -38,17 +38,17 @@ class network
    IPAddress new_gateway;
    IPAddress new_subnet;
    
-   bool CHECK_VALID_IP();	
-   void STORE_IP();
-   void LOAD_IP();
-   void GET_USER_IP(char* data);
+   bool checkValidIP();	
+   void storeIP();
+   void loadIP();
+   void getUserIP(char* data);
   
   public:
   
-	bool CHANGE_IP(char* data);
-	void NETWORK_INIT_CONFIG();
-	void START_ETH(byte* mac, EthernetServer& server);
-	void UPDATE_ETH_CONFIG();
+	bool changeIP(char* data);
+	void NetworkInitConfig();
+	void startEth(byte* mac, EthernetServer& server);
+	void updateEthConfig();
 	
 };
 

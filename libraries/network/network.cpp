@@ -2,7 +2,7 @@
 #include<network.h>
 
 
-void network::START_ETH(byte* mac, EthernetServer& server)
+void network::startEth(byte* mac, EthernetServer& server)
 {
   DEBUG_CM_PRINTLN("Starting Ethernet Connection...");
   Ethernet.begin(mac, ip, dns, gateway, subnet);
@@ -16,7 +16,7 @@ void network::START_ETH(byte* mac, EthernetServer& server)
 }
 
 
-bool network::CHECK_VALID_IP()
+bool network::checkValidIP()
 {
   bool network_10_x_x_x     =false;
   bool network_172_16_x_x   =false;
@@ -56,19 +56,10 @@ bool network::CHECK_VALID_IP()
 
  valid_network= ip_valid && gateway_valid;
 
- DEBUG_CM_PRINTLN("Print gateway : ");
- DEBUG_CM_PRINTLN(new_gateway);  
- 
- DEBUG_CM_PRINTLN("Print ip : ");
- DEBUG_CM_PRINTLN(new_ip);  
-
- DEBUG_CM_PRINTLN("Print valid network : ");
- DEBUG_CM_PRINTLN(valid_network);  
-
   return valid_network;
 }
 
-void network::STORE_IP()
+void network::storeIP()
 {
   EEPROM.write(IP_0_ADD, ip[0]);
   EEPROM.write(IP_1_ADD, ip[1]);
@@ -91,7 +82,7 @@ void network::STORE_IP()
   EEPROM.write(SUBNET_3_ADD, subnet[3]);
 }
 
-void network::LOAD_IP()
+void network::loadIP()
 {
   new_ip[0]=EEPROM.read(IP_0_ADD),
   new_ip[1]=EEPROM.read(IP_1_ADD),
@@ -114,7 +105,7 @@ void network::LOAD_IP()
   new_subnet[3]=EEPROM.read(SUBNET_3_ADD);
 }
 	
-void network::GET_USER_IP(char* data)
+void network::getUserIP(char* data)
 {
   StaticJsonBuffer<400> jsonBuffer;
   JsonObject& network_data = jsonBuffer.parseObject(data);
@@ -140,12 +131,12 @@ void network::GET_USER_IP(char* data)
   new_subnet[3]=network_data["subnet"][3];
  }
 
-void network::NETWORK_INIT_CONFIG()
+void network::NetworkInitConfig()
 {
 
-  LOAD_IP();
+  loadIP();
 
-  if (CHECK_VALID_IP())
+  if (checkValidIP())
     {
       ip=new_ip;
       dns=new_dns;
@@ -161,16 +152,16 @@ void network::NETWORK_INIT_CONFIG()
       delay(100);
 }
 	
-bool network::CHANGE_IP(char* data)
+bool network::changeIP(char* data)
 {
  bool change_ip_flag=false;
  
  DEBUG_CM_PRINTLN("***************************************************");
  DEBUG_CM_PRINTLN("Changing IP data...");
  
- GET_USER_IP(data);
+ getUserIP(data);
  
- if(CHECK_VALID_IP())
+ if(checkValidIP())
  {
   DEBUG_CM_PRINTLN("New Ethernet configuration received.");
   
@@ -179,15 +170,19 @@ bool network::CHANGE_IP(char* data)
   gateway=new_gateway;
   subnet=new_subnet;
   
-  STORE_IP();
+  storeIP();
   change_ip_flag=true;
+ }
+ else
+ {
+  DEBUG_CM_PRINTLN("INVALID Ethernet configuration !!!.");
  }
  
  return change_ip_flag; 
 }
 
 
-void network::UPDATE_ETH_CONFIG()
+void network::updateEthConfig()
 {
   DEBUG_CM_PRINTLN("Changing Ethernet configuration.");
   Ethernet.setStaticIP(ip, gateway, subnet);

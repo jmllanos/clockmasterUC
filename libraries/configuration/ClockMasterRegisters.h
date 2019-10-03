@@ -1,6 +1,8 @@
 
 #ifndef _CLOCK_MASTER_REGISTER_H_
 #define _CLOCK_MASTER_REGISTER_H_
+
+
 ////////
 //BUSSES CONFIGURATION
 #define ADDR_WIDTH 7//one bit more

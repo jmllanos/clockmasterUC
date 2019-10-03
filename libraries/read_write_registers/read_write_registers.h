@@ -8,9 +8,9 @@
 
 void SendPacketSPI(byte address, byte buf_data, byte *resp);
 
-void READ_REGISTER(byte address, byte *resp);
+byte READ_REGISTER(byte address, bool& SPI_OK);
 
-void WRITE_REGISTER(byte address, byte buf_data, byte *resp);
+void WRITE_REGISTER(byte address, byte buf_data, bool& SPI_OK);
 
 bool CHECK_CORRECT_READING(byte *resp);
 

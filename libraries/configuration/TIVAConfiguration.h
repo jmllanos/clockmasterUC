@@ -95,4 +95,16 @@
 // SYSTEM FREEZE COUNTER
 #define FREEZE_COUNTER_ADDR     130
 
+//********************************
+//// CLOCK MASTER
+// CHANNELS
+#define ENABLE_CHANNElS  0x0F
+#define DISABLE_CHANNELS 0x00
+#define NumberOfChannels 4  
+
+// PULSE GENERATOR
+#define ENABLE_PULSEGEN 0x01
+#define DISABLE_PULSEGEN 0x00
+
+
 #endif

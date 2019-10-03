@@ -16,31 +16,40 @@ void SendPacketSPI(byte address, byte buf_data, byte *resp)
   resp[2] = SPI.transfer(0);
 }
 
-void READ_REGISTER(byte address, byte *resp)
+byte READ_REGISTER(byte address, bool& SPI_OK)
 {
+  byte response[3];
   bitClear(address,7);//MSB define R/W, Preventing to write a register.
-  SendPacketSPI(address,0x00,resp);
+  SendPacketSPI(address,0x00,response);
+
+  SPI_OK= response[0]==ACK_KEY;
+ 
+  if(SPI_OK==false)
+  {
+      DEBUG_CM_PRINTLN("READING FAULT");
+      DEBUG_CM_PRINTLN("SPI_FAULT");
+  }
+  
+  return response[1];
 }
 
-void WRITE_REGISTER(byte address, byte buf_data, byte *resp)
+void WRITE_REGISTER(byte address, byte buf_data, bool& SPI_OK)
 {
+  byte response[3];
   bitSet(address,7);// MSB define R/W, set write
-  SendPacketSPI(address,buf_data,resp);
-}
+  SendPacketSPI(address,buf_data,response);
 
-bool CHECK_CORRECT_READING(byte *resp)
-{
-  bool correct_read=false;
-  correct_read=(resp[0] == ACK_KEY);
-  return correct_read;
-}
+  SPI_OK= response[0] == ACK_KEY &&
+          response[1] == ACK_KEY;
 
-bool CHECK_CORRECT_WRITING(byte *resp)
-{
-  bool correct_write=false;
-  correct_write= resp[0] == ACK_KEY &&
-                 resp[1] == ACK_KEY;
-  return correct_write;
+  if(SPI_OK==false || response[2]!=buf_data)
+  {
+    DEBUG_CM_PRINTLN("SPI FAULT");
+    DEBUG_CM_PRINTLN("Fault WRITING");
+    DEBUG_CM_PRINTLN("ADDRESS");
+    DEBUG_CM_PRINTLN2(address, HEX);
+  }
+
 }
 
 

@@ -49,53 +49,43 @@ UserRequest str2request (String request)
 
 }
 
-void thunderbolt::read_time()
+void thunderbolt::readTime()
 { 
     bool spi_ok=true;
     int year;
+    byte tmp;
+    
     DEBUG_CM_PRINTLN("******************");
     DEBUG_CM_PRINTLN("THUNDERBOLT TIME RECEIVED");
-    byte response[3];
-    READ_REGISTER(THUNDER_YEAR_L,response);
-    spi_ok = CHECK_CORRECT_READING(response) & spi_ok;
-    year=response[1];
-
-    READ_REGISTER(THUNDER_YEAR_H,response);
-    spi_ok = CHECK_CORRECT_READING(response) & spi_ok;
-    year=(response[1]<<8)|year;
+    
+    year=READ_REGISTER(THUNDER_YEAR_L,spi_ok);
+    
+    tmp=READ_REGISTER(THUNDER_YEAR_H,spi_ok);
+    year=(tmp<<8)|year;
 
     DEBUG_CM_PRINTLN("Year: ");
     DEBUG_CM_PRINTLN(year);
   
-    READ_REGISTER(THUNDER_MONTH,response);
+    tmp=READ_REGISTER(THUNDER_MONTH,spi_ok);
     DEBUG_CM_PRINTLN("Month: ");
-    DEBUG_CM_PRINTLN(response[1]);
-    spi_ok = CHECK_CORRECT_READING(response) & spi_ok;
+    DEBUG_CM_PRINTLN(tmp);
 
-    READ_REGISTER(THUNDER_DAY,response);
+    tmp=READ_REGISTER(THUNDER_DAY,spi_ok);
     DEBUG_CM_PRINTLN("Day: ");
-    DEBUG_CM_PRINTLN(response[1]);
-    spi_ok = CHECK_CORRECT_READING(response) & spi_ok;
+    DEBUG_CM_PRINTLN(tmp);
 
-    READ_REGISTER(THUNDER_HOUR,response);
+    tmp=READ_REGISTER(THUNDER_HOUR,spi_ok);
     DEBUG_CM_PRINTLN("Hour: ");
-    DEBUG_CM_PRINTLN(response[1]);
-    spi_ok = CHECK_CORRECT_READING(response) & spi_ok;
+    DEBUG_CM_PRINTLN(tmp);
 
-    READ_REGISTER(THUNDER_MINUTES,response);
+    tmp=READ_REGISTER(THUNDER_MINUTES,spi_ok);
     DEBUG_CM_PRINTLN("Minute: ");
-    DEBUG_CM_PRINTLN(response[1]);
-    spi_ok = CHECK_CORRECT_READING(response) & spi_ok;
+    DEBUG_CM_PRINTLN(tmp);
    
-    READ_REGISTER(THUNDER_SECONDS,response);
+    tmp=READ_REGISTER(THUNDER_SECONDS,spi_ok);
     DEBUG_CM_PRINTLN("Seconds: ");
-    DEBUG_CM_PRINTLN(response[1]);
-    spi_ok = CHECK_CORRECT_READING(response) & spi_ok;
+    DEBUG_CM_PRINTLN(tmp);
 
-    if(spi_ok==false)
-    {
-        DEBUG_CM_PRINTLN("SPI FAULT !!!");
-    }
     DEBUG_CM_PRINTLN("******************");
 
 }
