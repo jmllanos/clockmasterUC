@@ -50,6 +50,8 @@ class network
 	void startEth(byte* mac, EthernetServer& server);
 	void updateEthConfig();
 	
+	IPAddress getIP();
+	IPAddress getGateway();
 };
 
 

@@ -36,7 +36,7 @@
 #define IP_0_DEFAULT 10
 #define IP_1_DEFAULT 10
 #define IP_2_DEFAULT 10
-#define IP_3_DEFAULT 100
+#define IP_3_DEFAULT 119
 
 #define DNS_0_DEFAULT 10
 #define DNS_1_DEFAULT 10

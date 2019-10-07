@@ -1,6 +1,16 @@
 
 #include<network.h>
 
+IPAddress network::getIP()
+{
+ return ip;
+}
+
+IPAddress network::getGateway()
+{
+ return gateway;
+}
+
 
 void network::startEth(byte* mac, EthernetServer& server)
 {
