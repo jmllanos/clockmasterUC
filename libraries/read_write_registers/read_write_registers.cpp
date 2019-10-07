@@ -44,6 +44,7 @@ void WRITE_REGISTER(byte address, byte buf_data, bool& SPI_OK)
 
   if(SPI_OK==false || response[2]!=buf_data)
   {
+    SPI_OK=false;
     DEBUG_CM_PRINTLN("SPI FAULT");
     DEBUG_CM_PRINTLN("Fault WRITING");
     DEBUG_CM_PRINTLN("ADDRESS");

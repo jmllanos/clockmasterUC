@@ -38,9 +38,9 @@ UserRequest str2request (String request)
   {
       return Setpps;
   }
-  else if (request=="setchannels")
+  else if (request=="setchannel")
   {
-      return SetChannels;
+      return SetChannel;
   }
   else
   {

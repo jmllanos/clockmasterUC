@@ -4,7 +4,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <string.h>
-//#include "WatchdogMan.h"
+#include "WatchdogMan_AC2.h"
 #include "Energia.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
@@ -19,9 +19,9 @@
 
 #include <TIVAConfiguration.h>
 #include <ClockMaster.h>
-#include <Nokia_5110_AC2.h>
 
-
+#include<Nokia_5110_AC2.h>
+#include<Channel.h>
 //###################################################
 uint32_t invalid = 0;//bool
 uint32_t gps_disciplined;
@@ -48,30 +48,35 @@ ClockMaster clock_master;
 
 void setup()
 {
- // ConfigWatchDog(ncycles_WDT);
+  ConfigWatchDog();
+  INIT_LCD();
+  
   DEBUG_CM_BEGIN(BAUD_RATE);
   DEBUG_CM_PRINTLN("Serial started.");
   pinMode(PL_2,OUTPUT);
   digitalWrite(PL_2,HIGH);
-  delay(1500);
+  //delay(1500);
   digitalWrite(PL_2,LOW);
 //Reset TINY FPGA
+
+ 
   clock_master.NetworkInitConfig();
+  
 //INIT_I2C();
   INIT_SPI();
   clock_master.startEth(mac, server);
   initTimer(1); // timer a 0.5 hz..................
+ 
   pinMode(buttonPin, INPUT_PULLUP);
-  //ResetWatchDogTimer(ncycles_WDT);
- clock_master.init();
+  ResetWatchDogTimer();
+   clock_master.init();
+   DEBUG_CM_PRINTLN("TEST1");
 }
 
 
 void loop()
 {
-  
-   //ResetWatchDogTimer(ncycles_WDT);
-
+ ResetWatchDogTimer();
   //TEST_WATCHDOG();
 
   if(change_ip_flag)
@@ -139,8 +144,9 @@ void loop()
         digitalWrite(REST_LED, HIGH);
         switch (str2request(httpRequest.getResource()[0]))
         {      
-          case Reset:
-          
+          case SetChannel:
+              clock_master.setChannel(data);
+              httpReply.send(clock_master.getReplyMessage());
             break;
             
           case Start:
@@ -153,16 +159,6 @@ void loop()
             httpReply.send(clock_master.getReplyMessage());
             break;
                             
-          case Setdate:
-            clock_master.setPulsegen(data); 
-            httpReply.send(clock_master.getReplyMessage());
-            break;
-                               
-          case Setpps:
-           clock_master.setDivider(data); 
-            httpReply.send(clock_master.getReplyMessage());
-           break;
-          
           case ChangeIP:
           
             change_ip_flag=clock_master.changeIP(data);
@@ -206,8 +202,8 @@ void loop()
 
   client.stop();
 
- delay(1000);
-
+  SHOW_INFO_LCD();
+ 
 }
 
 void TEST_WATCHDOG()
@@ -268,4 +264,33 @@ void INIT_I2C()
 
   DEBUG_CM_PRINTLN("pase i2c sin conexion");
   //----------------###################################revisar colgado por pull ups
+}
+
+void INIT_LCD()
+{
+
+ ConfigSSIInterface();
+ ResetLCD();
+ EnableSlave();
+ InitLCD();
+}
+
+void SHOW_INFO_LCD()
+{
+  if (gear==false)
+  {
+    return;
+  }
+
+  noInterrupts();
+  digitalWrite(GEAR_LED, HIGH); 
+ 
+  clock_master.displayInfo();
+  ResetWatchDogTimer();
+  interrupts();
+
+  digitalWrite(GEAR_LED, LOW);
+  digitalWrite(INT_LED, LOW);
+
+  gear=false;
 }

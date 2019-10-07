@@ -12,6 +12,8 @@
 #include<PPSDivider.h>
 #include<read_write_registers.h>
 #include<string.h>
+#include<Nokia_5110_AC2.h>
+#include<Channel.h>
 
 enum UserRequest
 {
@@ -21,7 +23,7 @@ enum UserRequest
   Stop,
   Setdate,
   Setpps,
-  SetChannels,
+  SetChannel,
   Read,
   Write,
   ChangeIP,
@@ -29,7 +31,6 @@ enum UserRequest
 };
 
 UserRequest str2request (String request);
-
 
 class thunderbolt
 {
@@ -44,13 +45,19 @@ class ClockMaster : public network
 {
     private:
           
-         PPSDivider PPSdiv;
-          
-         PulseGenerator PulseGen;
-
          byte channels_mux_enable;
 
          String ReplyMessage;
+         
+         Channel channel0;
+         Channel channel1;
+         Channel channel2;
+         Channel channel3;
+         
+
+         int LCDRow1Index;
+         int LCDRow2Index;
+
     public:
   	  
       thunderbolt thunder;
@@ -59,10 +66,15 @@ class ClockMaster : public network
       void start();
       void stop();
       void reset();
-      void setDivider(char* data);
-      void setPulsegen(char* data);
-            
+     
+      void showIP(int row);
+      void showGateway(int row);
+      void displayInfo();
+      void showChannel(int channel);
+      void setChannel(char* data);
       String getReplyMessage();
+
+     
 };
 
 

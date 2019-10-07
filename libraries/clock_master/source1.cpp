@@ -6,6 +6,12 @@ void ClockMaster::init()
    bool spi_ok;
    byte status;
    
+
+   channel0.setNumber(0);
+   channel1.setNumber(1);
+   channel2.setNumber(2);
+   channel3.setNumber(3);
+
    WRITE_REGISTER(CH_MUX_ENABLE,DISABLE_CHANNELS,spi_ok);
    
    DEBUG_CM_PRINTLN("*************************");
@@ -18,7 +24,9 @@ void ClockMaster::init()
    {
     DEBUG_CM_PRINTLN("SPI FAULT: ");
    }
-  
+ 
+
+   LCDRow1Index=0;
    DEBUG_CM_PRINTLN("*************************");
 }
 
@@ -89,22 +97,59 @@ void ClockMaster::stop()
 }
 
 
-void ClockMaster::setDivider(char* data)
-{
-  DEBUG_CM_PRINTLN("***********************");
-  DEBUG_CM_PRINTLN("Setting Divider METHOD");
-  PPSdiv.set_parameters(data);
-  ReplyMessage=PPSdiv.get_ReplyMessage();
+void ClockMaster::setChannel(char* data)
+{   
+    StaticJsonBuffer<400> jsonBuffer;
+    JsonObject& _data = jsonBuffer.parseObject(data);
+        
+    int channel_number = (int) _data["channel"];
+   
 
-}
+    ReplyMessage="{\"channel\":";
 
+    DEBUG_CM_PRINTLN("**************");
+   
+    String tmp_str;
+    tmp_str=String(channel_number);
+    ReplyMessage+=tmp_str;
+    
+    switch(channel_number)
+    {
+        case 0:
+            DEBUG_CM_PRINTLN("Setting channel 0");
+            channel0.setParameters(_data);
+           
+            ReplyMessage+=channel0.getReplyMessage();
+            break;
+        case 1:
+            DEBUG_CM_PRINTLN("Setting channel 1");
+            channel1.setParameters(_data);
+            
+            ReplyMessage+=channel1.getReplyMessage();
+            break;
+        case 2:
+            DEBUG_CM_PRINTLN("Setting channel 2");
+            channel2.setParameters(_data);
+            
+            ReplyMessage+=channel2.getReplyMessage();
+            break;
+        case 3:
+            DEBUG_CM_PRINTLN("Setting channel 3");
+            channel3.setParameters(_data);
+            
+            ReplyMessage+=channel3.getReplyMessage();
+            break;
+        default:
+          
+            DEBUG_CM_PRINTLN("INVALID CHANNEL");
+            ReplyMessage="{\"channel\":\"Invalid\"";
+            break;
 
-void ClockMaster::setPulsegen(char* data)
-{
-  DEBUG_CM_PRINTLN("***********************");
-  DEBUG_CM_PRINTLN("Setting Pulse Generator METHOD");
-  PulseGen.set_parameters(data);
-  ReplyMessage= PulseGen.get_ReplyMessage();
+    }
+    
+    ReplyMessage+="}";
+    
+    DEBUG_CM_PRINTLN("**************");
 }
 
 
@@ -115,27 +160,6 @@ String ClockMaster::getReplyMessage()
 
 void ClockMaster::reset()
 {
-/*  String reply;
-  byte response[] = {0x0, 0x0, 0x0};
-  //noInterrupts();
-  DEBUG_CM_PRINTLN("***************************************************");
-  DEBUG_CM_PRINTLN("Clock Master reset method:");
-
-
-  DEBUG_CM_PRINTLN("Writing RESET register.");
-  WRITE_REGISTER(RESET,0x00,response); // Reset chip
-
-  if (CHECK_CORRECT_WRITING(response))
-  {
-   reply="{\"reset\":\"ok\"}";
-  }
-  else
-  {
-   reply="{\"reset\":\"spi fault\"}";
- }
-
-return reply;
-*/
 }
 
 
