@@ -43,7 +43,7 @@ class PulseGenerator
         
         int channel;
 
-        void get_user_parameters(char* data);
+        void get_user_parameters(JsonObject& data);
         void set_registers();
         void write_parameters();
         bool check_valid_config();
@@ -55,8 +55,9 @@ class PulseGenerator
     public:
         
        void get_parameters();
-       void set_parameters(char* );
-       
+       void set_parameters(JsonObject& data);
+      
+       void set_channel(int _channel);
        String get_ReplyMessage();
 };
 

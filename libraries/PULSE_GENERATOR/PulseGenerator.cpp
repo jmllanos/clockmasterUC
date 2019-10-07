@@ -1,23 +1,18 @@
 #include<PulseGenerator.h>
 
 
-void PulseGenerator::get_user_parameters(char* data)
+void PulseGenerator::get_user_parameters(JsonObject& pulsegen_data)
 {  
-  StaticJsonBuffer<800> jsonBuffer;
-  JsonObject& pulsegen_data = jsonBuffer.parseObject(data);
   
-  usr_year     = (int) pulsegen_data["year"][0];
-  usr_month    = (byte) pulsegen_data["month"][0];
-  usr_day      = (byte) pulsegen_data["day"][0];
-  usr_hour     = (byte) pulsegen_data["hour24h"][0];
-  usr_minutes  = (byte) pulsegen_data["minute"][0];
-  usr_seconds  = (byte) pulsegen_data["second"][0];
+  usr_year     = (int) pulsegen_data["year"];
+  usr_month    = (byte) pulsegen_data["month"];
+  usr_day      = (byte) pulsegen_data["day"];
+  usr_hour     = (byte) pulsegen_data["hour24h"];
+  usr_minutes  = (byte) pulsegen_data["minute"];
+  usr_seconds  = (byte) pulsegen_data["second"];
   
-  usr_width        =(long) pulsegen_data["widthPulse"][0];
-  usr_width_period =(long) pulsegen_data["period"][0];
-  
-  channel   = (int)pulsegen_data["channel"][0];
- 
+  usr_width        =(long) pulsegen_data["widthPulse"];
+  usr_width_period =(long) pulsegen_data["period"];
   
 }
 
@@ -84,14 +79,7 @@ void  PulseGenerator::write_parameters()
    WRITE_REGISTER(enable_addr,ENABLE_PULSEGEN,tmp);
    SPI_ok=SPI_ok & tmp;
  
-   // Setting Channel to PULSE GENERATOR  mode
-   selector=READ_REGISTER(CH_MUX_SELECTOR,tmp);
-   SPI_ok=SPI_ok & tmp;
-   
-   selector=bitSet(selector,channel);
-   WRITE_REGISTER(CH_MUX_SELECTOR,selector,tmp);
-   SPI_ok=SPI_ok & tmp;
-   
+     
 
    if(SPI_ok==false)
    {
@@ -101,14 +89,25 @@ void  PulseGenerator::write_parameters()
      return;
    }
     
-    ReplyMessage="{\"setdate\":\"ok\"}";
 
-    DEBUG_CM_PRINTLN("WRITING DONE");
-    DEBUG_CM_PRINT("Channel ");
-    DEBUG_CM_PRINT(channel);
-    DEBUG_CM_PRINTLN(": Output set as Pulse Generator");
-    DEBUG_CM_PRINTLN("***********************************");
+   DEBUG_CM_PRINTLN("WRITING DONE");
+   DEBUG_CM_PRINTLN("***********************************");
 }
+
+
+void PulseGenerator::set_channel(int _channel)
+{
+    if(channel>=NumberOfChannels-1)
+    {
+     DEBUG_CM_PRINTLN("INVALID CHANNEL !!!");
+     return;
+    }
+
+ channel = _channel;
+ set_registers();
+
+}
+
 
 
 bool PulseGenerator::check_valid_config()
@@ -116,13 +115,14 @@ bool PulseGenerator::check_valid_config()
   bool valid_config=true;
   
   String tmp;
-  ReplyMessage="{\"setdate\":\"Invalid\"";
-  
+
+  ReplyMessage=",\"year\":";
+  ReplyMessage+=String(usr_year);
+
   ReplyMessage+=",\"month\":";
   if (usr_month>=1  && usr_month<=12)
   {
-    tmp=String(usr_month);
-    ReplyMessage+=tmp;
+    ReplyMessage+=String(usr_month);
     valid_config=valid_config & true;
   }
   else
@@ -134,8 +134,7 @@ bool PulseGenerator::check_valid_config()
   ReplyMessage+=",\"day\":";
   if (usr_day>=1    && usr_day<=31)
  {
-    tmp=String(usr_day);
-    ReplyMessage+=tmp; 
+    ReplyMessage+=String(usr_day);
     valid_config=valid_config & true;
  } 
  else
@@ -147,8 +146,7 @@ bool PulseGenerator::check_valid_config()
   ReplyMessage+=",\"hour\":";
  if (usr_hour>=0   && usr_hour<=23)
  {
-    tmp=String(usr_hour);
-    ReplyMessage+=tmp; 
+    ReplyMessage+=String(usr_hour);
     valid_config=valid_config & true;
  }
  else
@@ -160,8 +158,7 @@ bool PulseGenerator::check_valid_config()
  ReplyMessage+=",\"minutes\":";
  if (usr_minutes>=0 && usr_minutes<=59)
  {
-   tmp=String(usr_minutes);
-    ReplyMessage+=tmp; 
+    ReplyMessage+=String(usr_minutes);
     valid_config=valid_config & true;
  }
   else
@@ -173,9 +170,8 @@ bool PulseGenerator::check_valid_config()
   ReplyMessage+=",\"seconds\":";
   if (usr_seconds>=0 && usr_seconds<=59)
  {
-   tmp=String(usr_seconds);
-    ReplyMessage+=tmp; 
-    valid_config=valid_config & true;
+   ReplyMessage+=String(usr_seconds);
+   valid_config=valid_config & true;
  }
   else
  {
@@ -183,27 +179,41 @@ bool PulseGenerator::check_valid_config()
     valid_config=valid_config & false;
  }
 
-  ReplyMessage+=",\"channel\":";
-  if(channel>=0 && channel<=NumberOfChannels-1)
+ ReplyMessage+=",\"widthPulse\":";
+ 
+ if(usr_width>0)
   {
-    tmp=String(channel);
-    ReplyMessage+=tmp; 
+    ReplyMessage+=String(usr_width);
     valid_config=valid_config & true;
   }
   else
   {
     ReplyMessage+="invalid";
     valid_config=valid_config & false;
-    DEBUG_CM_PRINTLN("INVALID CHANNEL !!!");
   }
 
-  ReplyMessage+="}";
+ ReplyMessage+=",\"period\":";
+ 
+ if(usr_width_period>0)
+  {
+    ReplyMessage+=String(usr_width_period);
+    valid_config=valid_config & true;
+  }
+  else
+  {
+    ReplyMessage+="invalid";
+    valid_config=valid_config & false;
+  }
+
   return valid_config;
 }
 
 
-void PulseGenerator::set_parameters(char* data)
+void PulseGenerator::set_parameters(JsonObject& data)
 {
+
+ ReplyMessage=""; 
+ 
   SPI_ok=true;
 
   get_user_parameters(data);
@@ -216,7 +226,6 @@ void PulseGenerator::set_parameters(char* data)
    return;
  }
 
- set_registers();
 
  write_parameters();
  
@@ -228,55 +237,6 @@ String PulseGenerator::get_ReplyMessage()
     return ReplyMessage;
 }
 
-void PulseGenerator::get_parameters()
-{
- /*  DEBUG_CM_PRINTLN("********************");
-   DEBUG_CM_PRINTLN("READING PULSE GENERATOR REGISTERS");
-    byte response[3];
-    int _usr_year;
-        
-    READ_REGISTER(usr_year_l_addr,response);
-    _usr_year=response[1];
-
-    READ_REGISTER(usr_year_h_addr,response);
-    _usr_year=(response[1]<<8) | _usr_year;    
-    
-    DEBUG_CM_PRINTLN("USER YEAR: ");
-    DEBUG_CM_PRINTLN(_usr_year);
-    
-    READ_REGISTER(usr_month_addr,response);
-    DEBUG_CM_PRINTLN("USER MONTH: ");
-    DEBUG_CM_PRINTLN(response[1]);
-
-    READ_REGISTER(usr_day_addr,response);		
-    DEBUG_CM_PRINTLN("USER DAY: ");
-    DEBUG_CM_PRINTLN(response[1]); 
-   
-    READ_REGISTER(usr_hour_addr,response);
-    DEBUG_CM_PRINTLN("USER HOUR: ");
-    DEBUG_CM_PRINTLN(response[1]);
-    
-    READ_REGISTER(usr_minutes_addr,response);
-    DEBUG_CM_PRINTLN("USER MINUTE: ");
-    DEBUG_CM_PRINTLN(response[1]);
-    
-    READ_REGISTER(usr_seconds_addr,response);
-    DEBUG_CM_PRINTLN("USER SECOND: ");
-    DEBUG_CM_PRINTLN(response[1]);
-   
-    READ_REGISTER(usr_width_high_0_addr,response);
-    DEBUG_CM_PRINTLN("USER width: ");
-    DEBUG_CM_PRINTLN(response[1]);
-   
-    READ_REGISTER(usr_width_period_0_addr,response);
-    DEBUG_CM_PRINTLN("USER period: ");
-    DEBUG_CM_PRINTLN(response[1]);
-
-    READ_REGISTER(enable_addr,response);
-    DEBUG_CM_PRINTLN("Enable status: ");
-    DEBUG_CM_PRINTLN(response[1]);
-*/
-}
 
 void PulseGenerator::set_registers()
 {

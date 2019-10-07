@@ -36,14 +36,7 @@ void PPSDivider::write_parameters()
    WRITE_REGISTER(stop_addr,stop,tmp);
    SPI_OK=SPI_OK & tmp;
    
-   // Setting Channel to DIVIDER mode
-   selector=READ_REGISTER(CH_MUX_SELECTOR,tmp);
-   SPI_OK=SPI_OK & tmp;
    
-   selector=bitClear(selector,channel);
-   WRITE_REGISTER(CH_MUX_SELECTOR,selector,tmp);
-   SPI_OK=SPI_OK & tmp;
-
    if(SPI_OK==false)
    {
        DEBUG_CM_PRINTLN("WRITE FAULT");
@@ -52,12 +45,7 @@ void PPSDivider::write_parameters()
        return;
    }
    
-   ReplyMessage="{\"setpps\":\"ok\"}";
    DEBUG_CM_PRINTLN("WRITE DONE");
-   DEBUG_CM_PRINT("Channel ");
-   DEBUG_CM_PRINT(channel);
-   DEBUG_CM_PRINTLN(": Output set as Pulse Generator");  
-   
    DEBUG_CM_PRINTLN("**************************************************");
 
 }
@@ -67,87 +55,88 @@ String PPSDivider::get_ReplyMessage()
     return ReplyMessage;
 }
 
-void PPSDivider::get_parameters()
+
+bool PPSDivider::check_valid_parameters()
 {
-   /*
-    long user_phase;
+    bool valid_parameters=true;
+    String tmp_str;
 
-    byte response[3];
+    ReplyMessage=",\"periodicTrue\":";
+    ReplyMessage+=String(per_true);
 
-    DEBUG_CM_PRINTLN("**************************************************");
-    DEBUG_CM_PRINTLN("READING PPS DIVIDER REGISTERS");
-    
-    WRITE_REGISTER(per_true_addr,per_true);
-    
-    READ_REGISTER(per_true_addr,response);
-    DEBUG_CM_PRINTLN("Periodic True");
-    DEBUG_CM_PRINTLN(response[1]);       
+    ReplyMessage+=",\"phase\":";
+    ReplyMessage+=String(phase);
 
-    READ_REGISTER(divider_addr,response);
-    DEBUG_CM_PRINTLN("Divider Number");
-    DEBUG_CM_PRINTLN(response[1]);       
-    
-    READ_REGISTER(phase_0_addr,response);
-    user_phase=response[1];
+    ReplyMessage+=",\"divider\":";
 
-    READ_REGISTER(phase_1_addr,response);
-    user_phase=(response[1]<<8)|user_phase;
-    
-    READ_REGISTER(phase_2_addr,response);
-    user_phase=(response[1]<<16)|user_phase;
-   
-    DEBUG_CM_PRINTLN("Phase");
-    DEBUG_CM_PRINTLN(user_phase);
-    
-    READ_REGISTER(width_addr,response);
-    DEBUG_CM_PRINTLN("width ");
-    DEBUG_CM_PRINTLN(response[1]);       
-    
-    READ_REGISTER(start_addr,response);
-    DEBUG_CM_PRINTLN("start ");
-    DEBUG_CM_PRINTLN(response[1]);       
-    
-    READ_REGISTER(stop_addr,response);
-    DEBUG_CM_PRINTLN("stop");
-    DEBUG_CM_PRINTLN(response[1]);       
-    
-    DEBUG_CM_PRINTLN("**************************************************");
-*/
+    if(divider>0)
+    {
+     valid_parameters=valid_parameters & true;
+     tmp_str=String(divider);
+     ReplyMessage+=tmp_str;
+    }
+    else
+    {
+     valid_parameters=valid_parameters & false;
+     ReplyMessage+="Invalid";
+    }
+
+    ReplyMessage+=",\"width\":";
+    if(width>0)
+    {
+     valid_parameters=valid_parameters & true;
+     tmp_str=String(width);
+     ReplyMessage+=tmp_str;
+    }
+    else
+    {
+     valid_parameters=valid_parameters & false;
+     ReplyMessage+="Invalid";
+    }
+
+
+  return valid_parameters;
+}
+
+void PPSDivider::get_user_parameters(JsonObject& divider_data)
+{
+  per_true = (byte)divider_data["periodicTrue"];
+  divider  = (byte)divider_data["divNumber"];
+  phase    = (long)divider_data["phase"];
+  width    = (byte)divider_data["width"];
+  start    = (byte)divider_data["start"];
+  stop     = (byte)divider_data["stop"];
+
 }
 
 
-void PPSDivider::get_user_parameters(char* data)
-{
-  StaticJsonBuffer<400> jsonBuffer;
-  JsonObject& divider_data = jsonBuffer.parseObject(data);
-  
-  per_true = (byte)divider_data["periodicTrue"][0];
-  divider  = (byte)divider_data["divNumber"][0];
-  phase    = (long)divider_data["phase"][0];
-  width    = (byte)divider_data["width"][0];
-  start    = (byte)divider_data["start"][0];
-  stop     = (byte)divider_data["stop"][0];
-  channel  = (int)divider_data["channel"][0];
- 
-}
-
-
-void PPSDivider::set_parameters(char* data)
+void PPSDivider::set_parameters(JsonObject& divider_data) 
 {
     SPI_OK=true;
-    get_user_parameters(data);
+    get_user_parameters(divider_data);
+    
+    if(check_valid_parameters())
+    {
+       write_parameters();
+    }
+    else
+    {
+       DEBUG_CM_PRINTLN("Invalid PPS divider parameters, ABORTING WRITE PROCESS !!!");
+    }
 
-    if(channel>NumberOfChannels-1)
+}
+
+
+void PPSDivider::set_channel(int _channel)
+{
+    if(channel>=NumberOfChannels-1)
     {
      DEBUG_CM_PRINTLN("INVALID CHANNEL !!!");
-     DEBUG_CM_PRINTLN("ABORTING SETTING PARAMETERS IN PPS DIVIDER  REGISTERS");
-   
-     ReplyMessage="{\"setpps\":\"Fault\",\"channel\":\"Invalid\"}"; 
      return;
     }
 
-    set_registers();
-    write_parameters();
+ channel = _channel;
+ set_registers();
 
 }
 

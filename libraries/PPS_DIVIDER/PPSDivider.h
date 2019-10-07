@@ -31,14 +31,16 @@ private:
 
    String ReplyMessage;
 
-  void get_user_parameters(char* data);
+  void get_user_parameters(JsonObject& data);
   void write_parameters(); 
   void set_registers();
+  bool check_valid_parameters();
 
 public:
-  void set_parameters(char* data);
-  void get_parameters();
-  
+  void set_parameters(JsonObject& data);
+
+  void set_channel(int _channel);
+
   String get_ReplyMessage();
 
 };
