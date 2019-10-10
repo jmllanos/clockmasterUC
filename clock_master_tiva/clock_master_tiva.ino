@@ -55,14 +55,13 @@ void setup()
   DEBUG_CM_PRINTLN("Serial started.");
   pinMode(PL_2,OUTPUT);
   digitalWrite(PL_2,HIGH);
-  //delay(1500);
   digitalWrite(PL_2,LOW);
 //Reset TINY FPGA
 
  
   clock_master.NetworkInitConfig();
   
-//INIT_I2C();
+
   INIT_SPI();
   clock_master.startEth(mac, server);
   initTimer(1); // timer a 0.5 hz..................
@@ -70,15 +69,14 @@ void setup()
   pinMode(buttonPin, INPUT_PULLUP);
   ResetWatchDogTimer();
    clock_master.init();
-   DEBUG_CM_PRINTLN("TEST1");
+   
 }
 
 
 void loop()
 {
  ResetWatchDogTimer();
-  //TEST_WATCHDOG();
-
+ 
   if(change_ip_flag)
   {
     clock_master.updateEthConfig();
@@ -236,6 +234,7 @@ void Timer1IntHandler()
   digitalWrite(INT_LED, HIGH);
   TimerIntClear(TIMER1_BASE, TIMER_TIMA_TIMEOUT);
   gear = true;
+
 }
 
 void INIT_SPI()
@@ -283,14 +282,9 @@ void SHOW_INFO_LCD()
   }
 
   noInterrupts();
-  digitalWrite(GEAR_LED, HIGH); 
- 
   clock_master.displayInfo();
-  ResetWatchDogTimer();
+  //ResetWatchDogTimer();
   interrupts();
-
-  digitalWrite(GEAR_LED, LOW);
-  digitalWrite(INT_LED, LOW);
 
   gear=false;
 }

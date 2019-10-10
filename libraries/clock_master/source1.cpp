@@ -18,15 +18,17 @@ void ClockMaster::init()
   
    if (spi_ok==true)
    {
-    DEBUG_CM_PRINTLN("CLOCK MASTER DISABLE: "); 
+    DEBUG_CM_PRINTLN("CLOCK MASTER DISABLE: ");
+    strStatus="DISABLE";
    }
    else
    {
     DEBUG_CM_PRINTLN("SPI FAULT: ");
+    strStatus="SPI FAIL";
    }
  
 
-   LCDRow1Index=0;
+   LCDRowIndex=0;
    DEBUG_CM_PRINTLN("*************************");
 }
 
@@ -42,10 +44,13 @@ void ClockMaster::getStatus()
   if(status==ENABLE_CHANNElS)
   {
    ReplyMessage="{\"status\":\"Enable\"}";
+   
+   strStatus="ENABLE";
   }
   else
   {
    ReplyMessage="{\"status\":\"Disable\"}";
+   strStatus="DISABLE";
   } 
  }
 
@@ -64,7 +69,7 @@ void ClockMaster::start()
    
   if(spi_ok)
   {
-   DEBUG_CM_PRINTLN("CLOCK MASTER CHANNELS DISABLE");
+   DEBUG_CM_PRINTLN("CLOCK MASTER CHANNELS ENABLE");
    ReplyMessage="{\"start\":\"ok\"}";
   }
   else
@@ -98,8 +103,12 @@ void ClockMaster::stop()
 
 
 void ClockMaster::setChannel(char* data)
-{   
-    StaticJsonBuffer<400> jsonBuffer;
+{  
+    bool invalidflag=false;
+    
+    SPIStatus=true;
+
+    StaticJsonBuffer<800> jsonBuffer;
     JsonObject& _data = jsonBuffer.parseObject(data);
         
     int channel_number = (int) _data["channel"];
@@ -118,35 +127,47 @@ void ClockMaster::setChannel(char* data)
         case 0:
             DEBUG_CM_PRINTLN("Setting channel 0");
             channel0.setParameters(_data);
-           
+            
+            SPIStatus=channel0.getSPIStatus();
+
             ReplyMessage+=channel0.getReplyMessage();
             break;
         case 1:
             DEBUG_CM_PRINTLN("Setting channel 1");
             channel1.setParameters(_data);
             
+            SPIStatus=channel1.getSPIStatus();
             ReplyMessage+=channel1.getReplyMessage();
             break;
         case 2:
             DEBUG_CM_PRINTLN("Setting channel 2");
             channel2.setParameters(_data);
             
+            SPIStatus=channel2.getSPIStatus();
             ReplyMessage+=channel2.getReplyMessage();
             break;
         case 3:
             DEBUG_CM_PRINTLN("Setting channel 3");
             channel3.setParameters(_data);
             
+            SPIStatus=channel3.getSPIStatus();
             ReplyMessage+=channel3.getReplyMessage();
             break;
         default:
-          
+
+            invalidflag=true;      
             DEBUG_CM_PRINTLN("INVALID CHANNEL");
             ReplyMessage="{\"channel\":\"Invalid\"";
             break;
 
     }
+  
     
+    if(SPIStatus==false & invalidflag==false)
+    {
+     ReplyMessage+=",\"SPI\":\"Fault\"";
+    }
+
     ReplyMessage+="}";
     
     DEBUG_CM_PRINTLN("**************");

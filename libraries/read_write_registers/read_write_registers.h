@@ -12,8 +12,4 @@ byte READ_REGISTER(byte address, bool& SPI_OK);
 
 void WRITE_REGISTER(byte address, byte buf_data, bool& SPI_OK);
 
-bool CHECK_CORRECT_READING(byte *resp);
-
-bool CHECK_CORRECT_WRITING(byte *resp);
-
 #endif

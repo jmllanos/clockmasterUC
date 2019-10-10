@@ -136,7 +136,7 @@ void PrintStr(int x, int y, char string[]){
 	int l = strlen(string);
 	int i = 0;
 
-	x = x - x%5;//Puts the cursor in a allowed position to avoid missaligning of the printed char
+	x = x - x%6;//Puts the cursor in a allowed position to avoid missaligning of the printed char
 
 	SetCursor(x,y);
 	ROM_GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6, GPIO_PIN_6);
@@ -156,7 +156,7 @@ void PrintStr(int x, int y, char string[]){
 		}		
 
 		character = string[i];
-        PrintChar(x+5*i,y+j,character);
+        PrintChar(x+6*i,y+j,character);
     }
 
 	while(ROM_SSIBusy(SSI0_BASE)){ResetWatchDogTimer();}	

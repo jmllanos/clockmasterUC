@@ -11,8 +11,8 @@ void PulseGenerator::get_user_parameters(JsonObject& pulsegen_data)
   usr_minutes  = (byte) pulsegen_data["minute"];
   usr_seconds  = (byte) pulsegen_data["second"];
   
-  usr_width        =(long) pulsegen_data["widthPulse"];
-  usr_width_period =(long) pulsegen_data["period"];
+  width        =(long) pulsegen_data["widthPulse"];
+  period       =(long) pulsegen_data["period"];
   
 }
 
@@ -24,15 +24,15 @@ void  PulseGenerator::write_parameters()
     byte usr_year_h = usr_year>>8;
     byte usr_year_l = usr_year;
     
-    byte usr_width_0=usr_width;
-    byte usr_width_1=usr_width>>8;
-    byte usr_width_2=usr_width>>16;
-    byte usr_width_3=usr_width>>24;
+    byte usr_width_0=width;
+    byte usr_width_1=width>>8;
+    byte usr_width_2=width>>16;
+    byte usr_width_3=width>>24;
 
-    byte usr_width_period_0=usr_width_period;
-    byte usr_width_period_1=usr_width_period>>8;
-    byte usr_width_period_2=usr_width_period>>16;
-    byte usr_width_period_3=usr_width_period>>24;
+    byte usr_width_period_0=period;
+    byte usr_width_period_1=period>>8;
+    byte usr_width_period_2=period>>16;
+    byte usr_width_period_3=period>>24;
 
     DEBUG_CM_PRINTLN("***********************************");
     DEBUG_CM_PRINTLN("WRITING PULSE GENERATOR REGISTERS WITH USER PARAMETERS");
@@ -85,7 +85,6 @@ void  PulseGenerator::write_parameters()
    {
      DEBUG_CM_PRINTLN("WRITE FAULT");
      DEBUG_CM_PRINTLN("***********************************");
-     ReplyMessage="{\"setdate\":\"SPI FAULT\"}";
      return;
    }
     
@@ -97,7 +96,7 @@ void  PulseGenerator::write_parameters()
 
 void PulseGenerator::set_channel(int _channel)
 {
-    if(channel>=NumberOfChannels-1)
+    if(_channel>NumberOfChannels-1)
     {
      DEBUG_CM_PRINTLN("INVALID CHANNEL !!!");
      return;
@@ -127,7 +126,7 @@ bool PulseGenerator::check_valid_config()
   }
   else
   {
-    ReplyMessage+="invalid";
+    ReplyMessage+="\"Invalid\"";
     valid_config=valid_config & false;
   }
 
@@ -139,7 +138,7 @@ bool PulseGenerator::check_valid_config()
  } 
  else
  {
-    ReplyMessage+="invalid";
+    ReplyMessage+="\"Invalid\"";
     valid_config=valid_config & false;
  }
  
@@ -151,7 +150,7 @@ bool PulseGenerator::check_valid_config()
  }
  else
  {
-    ReplyMessage+="invalid";
+    ReplyMessage+="\"Invalid\"";
     valid_config=valid_config & false;
  }
 
@@ -163,7 +162,7 @@ bool PulseGenerator::check_valid_config()
  }
   else
  {
-    ReplyMessage+="invalid";
+    ReplyMessage+="\"Invalid\"";
     valid_config=valid_config & false;
  }
 
@@ -175,45 +174,160 @@ bool PulseGenerator::check_valid_config()
  }
   else
  {
-    ReplyMessage+="invalid";
+    ReplyMessage+="\"Invalid\"";
     valid_config=valid_config & false;
  }
 
  ReplyMessage+=",\"widthPulse\":";
  
- if(usr_width>0)
+ if(width>0)
   {
-    ReplyMessage+=String(usr_width);
+    ReplyMessage+=String(width);
     valid_config=valid_config & true;
   }
   else
   {
-    ReplyMessage+="invalid";
+    ReplyMessage+="\"Invalid\"";
     valid_config=valid_config & false;
   }
 
  ReplyMessage+=",\"period\":";
  
- if(usr_width_period>0)
+ if(period>0)
   {
-    ReplyMessage+=String(usr_width_period);
+    ReplyMessage+=String(period);
     valid_config=valid_config & true;
   }
   else
   {
-    ReplyMessage+="invalid";
+    ReplyMessage+="\"invalid\"";
     valid_config=valid_config & false;
   }
 
   return valid_config;
 }
 
+void PulseGenerator::read_registers()
+{
+   bool tmp;
+   byte selector;
+
+    byte usr_year_h;
+    byte usr_year_l;
+    
+    byte width_0;
+    byte width_1;
+    byte width_2;
+    byte width_3;
+
+    byte period_0;
+    byte period_1;
+    byte period_2;
+    byte period_3;
+   
+   // date 
+    usr_year_h= READ_REGISTER(usr_year_h_addr,tmp);
+    SPI_ok=SPI_ok & tmp;
+    usr_year_l= READ_REGISTER(usr_year_l_addr,tmp);
+    SPI_ok=SPI_ok & tmp;
+   
+    usr_year=(usr_year_h<<8)| usr_year_l;
+
+    usr_month=READ_REGISTER(usr_month_addr,tmp);
+    SPI_ok=SPI_ok & tmp;
+    usr_day=READ_REGISTER(usr_day_addr,tmp);		
+    SPI_ok=SPI_ok & tmp;
+    usr_hour=READ_REGISTER(usr_hour_addr,tmp);
+    SPI_ok=SPI_ok & tmp;
+    usr_minutes=READ_REGISTER(usr_minutes_addr,tmp);
+    SPI_ok=SPI_ok & tmp;
+    usr_seconds=READ_REGISTER(usr_seconds_addr,tmp);
+    SPI_ok=SPI_ok & tmp;
+
+    // width high
+   width_3=READ_REGISTER(usr_width_high_3_addr,tmp);
+   SPI_ok=SPI_ok & tmp;
+   width_2=READ_REGISTER(usr_width_high_2_addr,tmp);
+   SPI_ok=SPI_ok & tmp;
+   width_1=READ_REGISTER(usr_width_high_1_addr,tmp);
+   SPI_ok=SPI_ok & tmp;
+   width_0=READ_REGISTER(usr_width_high_0_addr,tmp);
+   SPI_ok=SPI_ok & tmp;
+   
+   width=(width_3<<24)|(width_3<<16)|(width_1<<8)|width_0;
+    
+    // width period
+   period_3=READ_REGISTER(usr_width_period_3_addr,tmp);
+   SPI_ok=SPI_ok & tmp;
+   period_2=READ_REGISTER(usr_width_period_2_addr,tmp);
+   SPI_ok=SPI_ok & tmp;
+   period_1=READ_REGISTER(usr_width_period_1_addr,tmp);
+   SPI_ok=SPI_ok & tmp;
+   period_0=READ_REGISTER(usr_width_period_0_addr,tmp);
+   SPI_ok=SPI_ok & tmp;
+   
+   period=(period_3<<24)|(period_2<<16)|(period_1<<8)|period_0;
+   
+}
+
+void PulseGenerator::get_parameters()
+{
+  
+    read_registers();
+  
+  char charmessage[20];
+  String s;
+  String message;
+  
+   read_registers();
+   message="DATE:";
+   s=String(usr_day);
+   message+=s;
+   message+="/";
+   s=String(usr_month);
+   message+=s;
+   message+="/";
+   s=String(usr_year-2000);
+   message+=s;
+   
+   strcpy(charmessage,message.c_str());
+   PrintStr(0,2,charmessage);
+   DEBUG_CM_PRINTLN(message);
+   
+   message="HOUR:";
+   s=String(usr_hour);
+   message+=s;
+   message+=":";
+   s=String(usr_minutes);
+   message+=s;
+   message+=":";
+   s=String(usr_seconds);
+   message+=s;
+
+   strcpy(charmessage,message.c_str());
+   PrintStr(0,3,charmessage);
+   DEBUG_CM_PRINTLN(message);
+   
+   message="WIDTH:";
+   s=String(width);
+   message+=s;
+   strcpy(charmessage,message.c_str());
+   PrintStr(0,3,charmessage);
+   DEBUG_CM_PRINTLN(message);
+   
+   message="PERIOD:";
+   s=String(period);
+   message+=s;
+   strcpy(charmessage,message.c_str());
+   PrintStr(0,3,charmessage);
+   DEBUG_CM_PRINTLN(message);
+   
+   
+}
 
 void PulseGenerator::set_parameters(JsonObject& data)
 {
 
- ReplyMessage=""; 
- 
   SPI_ok=true;
 
   get_user_parameters(data);
@@ -237,6 +351,10 @@ String PulseGenerator::get_ReplyMessage()
     return ReplyMessage;
 }
 
+bool PulseGenerator::get_spi_status()
+{
+    return SPI_ok;
+}
 
 void PulseGenerator::set_registers()
 {
@@ -260,7 +378,7 @@ void PulseGenerator::set_registers()
 		usr_width_period_1_addr =PG0_WIDTH_PERIOD_1;
 		usr_width_period_0_addr =PG0_WIDTH_PERIOD_0;
 
-        DEBUG_CM_PRINTLN("Setting Pulse Generator of channel 0");
+        DEBUG_CM_PRINTLN("Setting registers address of Pulse Generator of channel 0");
 	   break;
 	         
 	  case 1:
@@ -281,7 +399,7 @@ void PulseGenerator::set_registers()
 		usr_width_period_1_addr =PG1_WIDTH_PERIOD_1;
 		usr_width_period_0_addr =PG1_WIDTH_PERIOD_0;
         
-        DEBUG_CM_PRINTLN("Setting Pulse Generator of channel 1");
+        DEBUG_CM_PRINTLN("Setting registers address of Pulse Generator of channel 1");
 	   break;
 
        case 2:
@@ -302,7 +420,7 @@ void PulseGenerator::set_registers()
 		usr_width_period_1_addr =PG2_WIDTH_PERIOD_1;
 		usr_width_period_0_addr =PG2_WIDTH_PERIOD_0;
         
-        DEBUG_CM_PRINTLN("Setting Pulse Generator of channel 2");
+        DEBUG_CM_PRINTLN("Setting registers address of Pulse Generator of channel 2");
 	   break;
 	  
 	  case 3:
@@ -323,7 +441,7 @@ void PulseGenerator::set_registers()
 		usr_width_period_1_addr =PG3_WIDTH_PERIOD_1;
 		usr_width_period_0_addr =PG3_WIDTH_PERIOD_0;
         
-        DEBUG_CM_PRINTLN("Setting Pulse Generator of channel 3");
+        DEBUG_CM_PRINTLN("Setting registers address of Pulse Generator of channel 3");
 	   break;
 	   
 	  }

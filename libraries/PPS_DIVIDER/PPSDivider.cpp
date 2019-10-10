@@ -41,7 +41,6 @@ void PPSDivider::write_parameters()
    {
        DEBUG_CM_PRINTLN("WRITE FAULT");
        DEBUG_CM_PRINTLN("****************");
-       ReplyMessage="{\"setpps\":\"SPI FAULT\"}";
        return;
    }
    
@@ -49,6 +48,72 @@ void PPSDivider::write_parameters()
    DEBUG_CM_PRINTLN("**************************************************");
 
 }
+
+void PPSDivider::read_registers()
+{
+    byte phase_0;
+    byte phase_1;
+    byte phase_2;
+    byte phase_3;
+
+  bool tmp;
+  
+   //READ_REGISTER(per_true_addr,tmp);
+   //SPI_OK=SPI_OK & tmp;
+   
+   divider=READ_REGISTER(divider_addr,tmp);
+   SPI_OK=SPI_OK & tmp;
+      
+   phase_0=READ_REGISTER(phase_0_addr,tmp);
+   SPI_OK=SPI_OK & tmp;
+
+   phase_1=READ_REGISTER(phase_1_addr,tmp);
+   SPI_OK=SPI_OK & tmp;
+  
+   phase_3= READ_REGISTER(phase_2_addr,tmp);
+   SPI_OK=SPI_OK & tmp;
+   
+   //width= READ_REGISTER(width_addr,tmp);
+   //SPI_OK=SPI_OK & tmp;
+  
+   phase=(phase_2<<16)|(phase_1<<8)|phase_0;
+   
+}
+
+void PPSDivider::get_parameters()
+{
+  char charmessage[20];
+  String s;
+  String message;
+  
+   read_registers();
+   message="DIVIDER:";
+   s=String(divider);
+   
+   message+=s;
+   strcpy(charmessage,message.c_str());
+   PrintStr(0,2,charmessage);
+
+   DEBUG_CM_PRINTLN(message);
+  
+   message="PHASE:";
+   s=String(phase);
+   
+   message+=s;
+   strcpy(charmessage,message.c_str());
+   PrintStr(0,3,charmessage);
+
+   DEBUG_CM_PRINTLN(message);
+   
+   message="WIDTH:";
+   s=String(width);
+   message+=s;
+   strcpy(charmessage,message.c_str());
+   PrintStr(0,4,charmessage);
+
+   DEBUG_CM_PRINTLN(message);
+}
+
 
 String PPSDivider::get_ReplyMessage()
 {
@@ -78,7 +143,7 @@ bool PPSDivider::check_valid_parameters()
     else
     {
      valid_parameters=valid_parameters & false;
-     ReplyMessage+="Invalid";
+     ReplyMessage+="\"Invalid\"";
     }
 
     ReplyMessage+=",\"width\":";
@@ -91,7 +156,7 @@ bool PPSDivider::check_valid_parameters()
     else
     {
      valid_parameters=valid_parameters & false;
-     ReplyMessage+="Invalid";
+     ReplyMessage+="\"Invalid\"";
     }
 
 
@@ -102,7 +167,7 @@ void PPSDivider::get_user_parameters(JsonObject& divider_data)
 {
   per_true = (byte)divider_data["periodicTrue"];
   divider  = (byte)divider_data["divNumber"];
-  phase    = (long)divider_data["phase"];
+  phase    = (uint32_t)divider_data["phase"];
   width    = (byte)divider_data["width"];
   start    = (byte)divider_data["start"];
   stop     = (byte)divider_data["stop"];
@@ -129,7 +194,7 @@ void PPSDivider::set_parameters(JsonObject& divider_data)
 
 void PPSDivider::set_channel(int _channel)
 {
-    if(channel>=NumberOfChannels-1)
+    if(_channel>NumberOfChannels-1)
     {
      DEBUG_CM_PRINTLN("INVALID CHANNEL !!!");
      return;
@@ -140,6 +205,10 @@ void PPSDivider::set_channel(int _channel)
 
 }
 
+bool PPSDivider::get_spi_status()
+{
+    return SPI_OK;
+}
 
 void PPSDivider::set_registers()
 {
@@ -151,10 +220,10 @@ switch(channel)
 		phase_0_addr =PPS_DIV_0_PHASE_0 ; 
 		phase_1_addr =PPS_DIV_0_PHASE_1 ;
 		phase_2_addr =PPS_DIV_0_PHASE_2 ; 
-        width_addr   =PPS_DIV_0_WIDTH;    
+		width_addr   =PPS_DIV_0_WIDTH;    
 		start_addr   =PPS_DIV_0_START;   
 		stop_addr    =PPS_DIV_0_STOP ;
-        DEBUG_CM_PRINTLN("Setting PPS Divider of channel 0"); 
+        DEBUG_CM_PRINTLN("Setting registers address of PPS Divider of channel 0"); 
         break;
 
 	  case 1:
@@ -163,10 +232,10 @@ switch(channel)
 		phase_0_addr =PPS_DIV_1_PHASE_0 ; 
 		phase_1_addr =PPS_DIV_1_PHASE_1 ;
 		phase_2_addr =PPS_DIV_1_PHASE_2 ; 
-        width_addr   =PPS_DIV_1_WIDTH;    
+                width_addr   =PPS_DIV_1_WIDTH;    
 		start_addr   =PPS_DIV_1_START;   
 		stop_addr    =PPS_DIV_1_STOP ;
-        DEBUG_CM_PRINTLN("Setting PPS Divider of channel 1"); 
+        DEBUG_CM_PRINTLN("Setting registers address of PPS Divider of channel 1"); 
         break;
 
 	  case 2:
@@ -175,10 +244,10 @@ switch(channel)
 		phase_0_addr =PPS_DIV_2_PHASE_0 ; 
 		phase_1_addr =PPS_DIV_2_PHASE_1 ;
 		phase_2_addr =PPS_DIV_2_PHASE_2 ; 
-        width_addr   =PPS_DIV_2_WIDTH;    
+                width_addr   =PPS_DIV_2_WIDTH;    
 		start_addr   =PPS_DIV_2_START;   
 		stop_addr    =PPS_DIV_2_STOP ;
-        DEBUG_CM_PRINTLN("Setting PPS Divider of channel 2"); 
+        DEBUG_CM_PRINTLN("Setting registers address of PPS Divider of channel 2"); 
         break;   
 
 	  case 3:
@@ -187,14 +256,15 @@ switch(channel)
 		phase_0_addr =PPS_DIV_3_PHASE_0 ; 
 		phase_1_addr =PPS_DIV_3_PHASE_1 ;
 		phase_2_addr =PPS_DIV_3_PHASE_2 ; 
-        width_addr   =PPS_DIV_3_WIDTH;    
+                width_addr   =PPS_DIV_3_WIDTH;    
 		start_addr   =PPS_DIV_3_START;   
 		stop_addr    =PPS_DIV_3_STOP ;   
-        DEBUG_CM_PRINTLN("Setting PPS Divider of channel 3"); 
+        DEBUG_CM_PRINTLN("Setting registers address of PPS Divider of channel 3"); 
         break;
 
       default:
-        DEBUG_CM_PRINTLN("INVALID CHANNEL");
+        DEBUG_CM_PRINTLN(channel);
+        DEBUG_CM_PRINTLN("PPS INVALID CHANNEL");
 
 	} 
 

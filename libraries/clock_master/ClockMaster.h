@@ -54,9 +54,11 @@ class ClockMaster : public network
          Channel channel2;
          Channel channel3;
          
+         int LCDRowIndex=0;
 
-         int LCDRow1Index;
-         int LCDRow2Index;
+         bool SPIStatus;
+         
+         String strStatus;
 
     public:
   	  
@@ -68,12 +70,12 @@ class ClockMaster : public network
       void reset();
      
       void showIP(int row);
-      void showGateway(int row);
       void displayInfo();
       void showChannel(int channel);
+      void showStatus(int row);
+
       void setChannel(char* data);
       String getReplyMessage();
-
      
 };
 

@@ -7,6 +7,7 @@
 #include<read_write_registers.h>
 #include<ArduinoJson.h>
 #include<string.h>
+#include<Nokia_5110_AC2.h>
 
 class PulseGenerator
 {
@@ -38,8 +39,8 @@ class PulseGenerator
         byte usr_minutes;
         byte usr_seconds;
         
-        long usr_width;
-        long usr_width_period;
+        long width;
+        long period;
         
         int channel;
 
@@ -51,7 +52,8 @@ class PulseGenerator
         bool SPI_ok;
 
         String ReplyMessage;
-    
+   
+        void read_registers();
     public:
         
        void get_parameters();
@@ -59,6 +61,10 @@ class PulseGenerator
       
        void set_channel(int _channel);
        String get_ReplyMessage();
+       
+       bool get_spi_status();
+
+
 };
 
 

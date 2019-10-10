@@ -16,16 +16,22 @@ class Channel
         PPSDivider PPSdiv;
         PulseGenerator PulseGen;
         
-        String mode="unassigned";
+        String mode="XX";
         int channelNumber;
-
+ 
         String ReplyMessage;
+
+        bool SPIOKFlag;
     public:
         void setParameters(JsonObject& channel_data);
         void setNumber(int _channelNumber);
         String getMode();
 
         String getReplyMessage();
+
+        bool getSPIStatus();
+
+        void getParameters();
 };
 
 

@@ -6,6 +6,7 @@
 #include<read_write_registers.h>
 #include<ArduinoJson.h>
 #include<string.h>
+#include<Nokia_5110_AC2.h>
 
 class PPSDivider
 {
@@ -21,7 +22,7 @@ private:
    
    byte per_true;
    byte divider;
-   long phase;
+   uint32_t phase;
    byte width;
    byte start;
    byte stop;
@@ -35,7 +36,8 @@ private:
   void write_parameters(); 
   void set_registers();
   bool check_valid_parameters();
-
+  
+  void read_registers();
 public:
   void set_parameters(JsonObject& data);
 
@@ -43,6 +45,9 @@ public:
 
   String get_ReplyMessage();
 
+  bool get_spi_status();
+
+  void get_parameters();
 };
 
 
