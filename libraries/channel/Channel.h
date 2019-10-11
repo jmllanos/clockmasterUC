@@ -25,7 +25,6 @@ class Channel
     public:
         void setParameters(JsonObject& channel_data);
         void setNumber(int _channelNumber);
-        String getMode();
 
         String getReplyMessage();
 

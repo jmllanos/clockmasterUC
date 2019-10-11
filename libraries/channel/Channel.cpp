@@ -27,7 +27,8 @@ void Channel::setParameters(JsonObject& channel_data)
      DEBUG_CM_PRINTLN(mode);
      
      PulseGen.set_parameters(channel_data);        
-  // Setting Channel to PULSE GENERATOR  mode
+   
+     // Setting Channel to pulse generator mode
      selector=READ_REGISTER(CH_MUX_SELECTOR,tmp);
      SPIOKFlag=SPIOKFlag & tmp;
     
@@ -38,14 +39,17 @@ void Channel::setParameters(JsonObject& channel_data)
     ReplyMessage=",\"mode\":\"pulsegen\"";
     ReplyMessage+=PulseGen.get_ReplyMessage();
    
+    WRITE_REGISTER(CH_MUX_ENABLE,ENABLE_CHANNElS,tmp);
+    SPIOKFlag=SPIOKFlag & tmp;
+   
     SPIOKFlag=SPIOKFlag & PulseGen.get_spi_status();
+    
   }    
 
   else if(tmp_mode=="divider" )
   {
      mode =tmp_mode;
-    
-    
+        
      DEBUG_CM_PRINT("MODE: ");
      DEBUG_CM_PRINTLN(mode);
       
@@ -61,6 +65,9 @@ void Channel::setParameters(JsonObject& channel_data)
        ReplyMessage=",\"mode\": \"divider\"";
        ReplyMessage+=PPSdiv.get_ReplyMessage();
  
+       WRITE_REGISTER(CH_MUX_ENABLE,ENABLE_CHANNElS,tmp);
+       SPIOKFlag=SPIOKFlag & tmp;
+
       SPIOKFlag=SPIOKFlag & PPSdiv.get_spi_status();
 
   }
@@ -78,10 +85,6 @@ bool Channel::getSPIStatus()
     return SPIOKFlag;
 }
 
-String Channel::getMode()
-{
-    return mode;
-}
 
 void Channel::getParameters()
 {
@@ -103,8 +106,6 @@ void Channel::getParameters()
         DEBUG_CM_PRINTLN("MODE:XX");
         PrintStr(0,1,"MODE:XX");
     }
-
-
  
 }
 
