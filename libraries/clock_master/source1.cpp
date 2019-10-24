@@ -127,10 +127,9 @@ void ClockMaster::setChannel(char* data)
         case 0:
             DEBUG_CM_PRINTLN("Setting channel 0");
             channel0.setParameters(_data);
-            
             SPIStatus=channel0.getSPIStatus();
-
             ReplyMessage+=channel0.getReplyMessage();
+
             break;
         case 1:
             DEBUG_CM_PRINTLN("Setting channel 1");

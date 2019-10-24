@@ -73,8 +73,8 @@ void PPSDivider::read_registers()
    phase_3= READ_REGISTER(phase_2_addr,tmp);
    SPI_OK=SPI_OK & tmp;
    
-   //width= READ_REGISTER(width_addr,tmp);
-   //SPI_OK=SPI_OK & tmp;
+   width= READ_REGISTER(width_addr,tmp);
+   SPI_OK=SPI_OK & tmp;
   
    phase=(phase_2<<16)|(phase_1<<8)|phase_0;
    
