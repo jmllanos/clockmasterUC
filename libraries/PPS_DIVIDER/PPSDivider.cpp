@@ -80,38 +80,25 @@ void PPSDivider::read_registers()
    
 }
 
-void PPSDivider::get_parameters()
+String PPSDivider::get_parameters()
 {
-  char charmessage[20];
-  String s;
-  String message;
+   
+   String LCDMessage;
   
    read_registers();
-   message="DIVIDER:";
-   s=String(divider);
    
-   message+=s;
-   strcpy(charmessage,message.c_str());
-   PrintStr(0,2,charmessage);
-
-   DEBUG_CM_PRINTLN(message);
-  
-   message="PHASE:";
-   s=String(phase);
+   LCDMessage="DIVIDER: ";
+   LCDMessage+= String(divider);
+      
+   LCDMessage= LCDMessage + "\n" + "PHASE: ";
+   LCDMessage+= String(phase);
    
-   message+=s;
-   strcpy(charmessage,message.c_str());
-   PrintStr(0,3,charmessage);
-
-   DEBUG_CM_PRINTLN(message);
+   LCDMessage= LCDMessage + "\n" + "WIDTH: ";
+   LCDMessage+= String(width);
    
-   message="WIDTH:";
-   s=String(width);
-   message+=s;
-   strcpy(charmessage,message.c_str());
-   PrintStr(0,4,charmessage);
-
-   DEBUG_CM_PRINTLN(message);
+   DEBUG_CM_PRINTLN(LCDMessage);
+   
+   return LCDMessage;
 }
 
 

@@ -31,6 +31,22 @@
 
 #define ncycles_WDT F_CPU*8 //
 
+//**********************
+//** LCD ILI9341******* 
+// SPI_SW PINS
+#define TFT_DC   PC_5
+#define TFT_CS   PE_5
+#define TFT_MOSI PC_4
+#define TFT_CLK  PE_4
+#define TFT_RST  PC_6
+#define TFT_MISO PD_3
+//  TEXT SIZE;
+#define TEXTWIDTH  3
+#define TEXTHEIGHT 5
+//  Colors
+#define BACKGROUND  ILI9341_BLACK
+#define TEXTCOLOR   ILI9341_WHITE       
+
 //***********************
 //NETWROK DEFAULT VALUES
 #define IP_0_DEFAULT 10

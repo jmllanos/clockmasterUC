@@ -160,16 +160,36 @@ void ClockMaster::setChannel(char* data)
             break;
 
     }
-  
-    
+   
+     tft.setTextColor(BACKGROUND); 
+     tft.setCursor(0,0);
+     tft.println(lcdmessage);
+     
+        
     if(SPIStatus==false & invalidflag==false)
     {
      ReplyMessage+=",\"SPI\":\"Fault\"";
+     lcdmessage="WRITE FAuLT";
     }
-
+    else
+    {
+      lcdmessage="WRITE DONE";
+    }
+     
     ReplyMessage+="}";
     
+       
+    tft.setTextColor(TEXTCOLOR);
+    tft.setCursor(50,80);
+    tft.println(lcdmessage);
+    
     DEBUG_CM_PRINTLN("**************");
+    delay(1000);
+    
+    tft.setTextColor(ILI9341_BLACK);
+    tft.setCursor(50,80);
+    tft.println(lcdmessage);
+    
 }
 
 

@@ -14,14 +14,16 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/timer.h"
 
+#include "Adafruit_GFX.h"
+#include "Adafruit_ILI9341.h"
+
 #include <ArduinoHttpServer.h>
 #include <EEPROM.h>
 
 #include <TIVAConfiguration.h>
 #include <ClockMaster.h>
 
-#include<Nokia_5110_AC2.h>
-#include<Channel.h>
+
 //###################################################
 uint32_t invalid = 0;//bool
 uint32_t gps_disciplined;
@@ -43,12 +45,15 @@ byte response[] = {0x0, 0x0, 0x0};
 
 volatile uint8_t state = 0;
 
+
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
 ClockMaster clock_master;
 //***********************************************
 
 void setup()
 {
   ConfigWatchDog();
+  
   INIT_LCD();
   
   DEBUG_CM_BEGIN(BAUD_RATE);
@@ -76,8 +81,9 @@ void setup()
 void loop()
 {
  ResetWatchDogTimer();
+
  
-  if(change_ip_flag)
+ if(change_ip_flag)
   {
     clock_master.updateEthConfig();
     change_ip_flag=false;
@@ -267,11 +273,11 @@ void INIT_I2C()
 
 void INIT_LCD()
 {
-
- ConfigSSIInterface();
- ResetLCD();
- EnableSlave();
- InitLCD();
+  tft.begin();
+  tft.fillScreen(BACKGROUND); 
+  tft.setRotation(3);
+  tft.setTextSize(TEXTWIDTH,TEXTHEIGHT);
+  tft.setTextColor(TEXTCOLOR);
 }
 
 void SHOW_INFO_LCD()
@@ -283,7 +289,8 @@ void SHOW_INFO_LCD()
 
   noInterrupts();
   clock_master.displayInfo();
-  //ResetWatchDogTimer();
+  ResetWatchDogTimer();
+  delay(1500);
   interrupts();
 
   gear=false;

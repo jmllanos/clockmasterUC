@@ -23,8 +23,7 @@ void Channel::setParameters(JsonObject& channel_data)
   {
      mode =tmp_mode;
      
-     DEBUG_CM_PRINT("MODE: ");
-     DEBUG_CM_PRINTLN(mode);
+     DEBUG_CM_PRINT("MODE: PULSEGEN");
      
      PulseGen.set_parameters(channel_data);        
    
@@ -50,8 +49,7 @@ void Channel::setParameters(JsonObject& channel_data)
   {
      mode =tmp_mode;
         
-     DEBUG_CM_PRINT("MODE: ");
-     DEBUG_CM_PRINTLN(mode);
+     DEBUG_CM_PRINT("MODE: DIVIDER");
       
      PPSdiv.set_parameters(channel_data);
    // Setting Channel to DIVIDER mode
@@ -86,27 +84,30 @@ bool Channel::getSPIStatus()
 }
 
 
-void Channel::getParameters()
+String Channel::getParameters()
 {
+   String LCDMessage;
 
     if(mode=="pulsegen")
     {
-        PrintStr(0,1,"MODE:PULSEGEN");
-        DEBUG_CM_PRINTLN("MODE:PULSEGEN");
-        PulseGen.get_parameters();
+        LCDMessage="MODE: PULSEGEN";
+        
+        DEBUG_CM_PRINTLN("MODE: PULSEGEN");
+        LCDMessage=LCDMessage +"\n" + PulseGen.get_parameters();
     }
     else if(mode=="divider")
     {
-        PrintStr(0,1,"MODE:PPSDIV");
-        DEBUG_CM_PRINTLN("MODE:PPSDIV");
-        PPSdiv.get_parameters();
+        LCDMessage="MODE: PPSDIVIDER";
+        DEBUG_CM_PRINTLN("MODE: PPSDIV");
+        LCDMessage=LCDMessage +"\n" + PPSdiv.get_parameters();
     }
     else
     {
         DEBUG_CM_PRINTLN("MODE:XX");
-        PrintStr(0,1,"MODE:XX");
+        LCDMessage="MODE: XX";
     }
  
+ return LCDMessage;
 }
 
 String Channel::getReplyMessage()

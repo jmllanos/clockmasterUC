@@ -12,8 +12,9 @@
 #include<PPSDivider.h>
 #include<read_write_registers.h>
 #include<string.h>
-#include<Nokia_5110_AC2.h>
 #include<Channel.h>
+#include "Adafruit_GFX.h"
+#include "Adafruit_ILI9341.h"
 
 enum UserRequest
 {
@@ -59,6 +60,7 @@ class ClockMaster : public network
          bool SPIStatus;
          
          String strStatus;
+         String lcdmessage;
 
     public:
   	  
@@ -69,10 +71,10 @@ class ClockMaster : public network
       void stop();
       void reset();
      
-      void showIP(int row);
+      void showIP();
       void displayInfo();
       void showChannel(int channel);
-      void showStatus(int row);
+      void showStatus();
 
       void setChannel(char* data);
       String getReplyMessage();

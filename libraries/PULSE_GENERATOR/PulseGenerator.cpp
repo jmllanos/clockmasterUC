@@ -270,58 +270,38 @@ void PulseGenerator::read_registers()
    
 }
 
-void PulseGenerator::get_parameters()
+String PulseGenerator::get_parameters()
 {
-  
-    read_registers();
-  
-  char charmessage[20];
-  String s;
-  String message;
-  
+    
+   String LCDMessage;
+ 
    read_registers();
-   message="DATE:";
-   s=String(usr_day);
-   message+=s;
-   message+="/";
-   s=String(usr_month);
-   message+=s;
-   message+="/";
-   s=String(usr_year-2000);
-   message+=s;
+  
+   LCDMessage="DATE: ";
+   LCDMessage+=String(usr_day);
+   LCDMessage+="/";
+   LCDMessage+=String(usr_month);
+   LCDMessage+="/";
+   LCDMessage+=String(usr_year-2000);
+    
+   LCDMessage=LCDMessage +"\n" +"HOUR: ";
+   LCDMessage+=String(usr_hour);
+   LCDMessage+=":";
+   LCDMessage+=String(usr_minutes);
+   LCDMessage+=":";
+   LCDMessage+=String(usr_seconds);
    
-   strcpy(charmessage,message.c_str());
-   PrintStr(0,2,charmessage);
-   DEBUG_CM_PRINTLN(message);
+      
+   LCDMessage=LCDMessage +"\n"+"WIDTH: ";
+   LCDMessage+=String(width);
+  
    
-   message="HOUR:";
-   s=String(usr_hour);
-   message+=s;
-   message+=":";
-   s=String(usr_minutes);
-   message+=s;
-   message+=":";
-   s=String(usr_seconds);
-   message+=s;
-
-   strcpy(charmessage,message.c_str());
-   PrintStr(0,3,charmessage);
-   DEBUG_CM_PRINTLN(message);
+   LCDMessage=LCDMessage + "\n"+"PERIOD: ";
+   LCDMessage+=String(period);
    
-   message="WIDTH:";
-   s=String(width);
-   message+=s;
-   strcpy(charmessage,message.c_str());
-   PrintStr(0,3,charmessage);
-   DEBUG_CM_PRINTLN(message);
+   DEBUG_CM_PRINTLN(LCDMessage);
    
-   message="PERIOD:";
-   s=String(period);
-   message+=s;
-   strcpy(charmessage,message.c_str());
-   PrintStr(0,3,charmessage);
-   DEBUG_CM_PRINTLN(message);
-   
+   return LCDMessage;
    
 }
 

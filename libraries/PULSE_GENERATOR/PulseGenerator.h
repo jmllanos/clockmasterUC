@@ -7,7 +7,9 @@
 #include<read_write_registers.h>
 #include<ArduinoJson.h>
 #include<string.h>
-#include<Nokia_5110_AC2.h>
+
+#include "Adafruit_GFX.h"
+#include "Adafruit_ILI9341.h"
 
 class PulseGenerator
 {
@@ -56,7 +58,7 @@ class PulseGenerator
         void read_registers();
     public:
         
-       void get_parameters();
+       String get_parameters();
        void set_parameters(JsonObject& data);
       
        void set_channel(int _channel);
