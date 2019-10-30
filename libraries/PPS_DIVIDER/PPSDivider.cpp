@@ -87,7 +87,7 @@ String PPSDivider::get_parameters()
   
    read_registers();
    
-   LCDMessage="DIVIDER: ";
+   LCDMessage="DIVISOR: ";
    LCDMessage+= String(divider);
       
    LCDMessage= LCDMessage + "\n" + "PHASE: ";

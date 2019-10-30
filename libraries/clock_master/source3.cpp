@@ -12,8 +12,7 @@ void ClockMaster::displayInfo()
    tft.setTextColor(TEXTCOLOR);
 
  switch(LCDRowIndex)
- {
-     
+ {  
      case 0:
         
          showStatus();
@@ -56,8 +55,16 @@ void ClockMaster::displayInfo()
          
          tft.println(lcdmessage);
          
-         LCDRowIndex=0;
+         LCDRowIndex++;
          break;
+     
+     case 5:
+     	
+     	 showCGS();
+     	 tft.println(lcdmessage);
+         
+         LCDRowIndex=0;
+     	break;
 
  } 
  
@@ -122,7 +129,7 @@ lcdmessage=lcdmessage+ "\n";
 lcdmessage+= String(mygate[0]) + ".";
 lcdmessage+= String(mygate[1]) + ".";
 lcdmessage+= String(mygate[2]) + ".";
-lcdmessage+= String(myip[3]) ;
+lcdmessage+= String(mygate[3]) ;
 
  
  DEBUG_CM_PRINTLN("***********************");
@@ -164,4 +171,30 @@ DEBUG_CM_PRINTLN("***********************");
 
 DEBUG_CM_PRINTLN("***********************");
 
+}
+
+void ClockMaster::showCGS()
+{
+   lcdmessage="CGS CHANNELS";
+   lcdmessage+="\n";
+   
+   lcdmessage+="FREQ0: ";
+   lcdmessage+="xx.xx MHz";//PUT YOUR FUNCTION HERE FOR FREQ0
+   lcdmessage+= "\n";
+   lcdmessage+="SOURCE0: ";
+   lcdmessage+="GPS"; //PUT YOUR FUNCTION HERE FOR SOURCE0
+   
+   lcdmessage+="\n";
+   lcdmessage+="\n";
+   
+   lcdmessage+="FREQ1: ";
+   lcdmessage+="xx.xx MHz";//PUT YOUR FUNCTION HERE FOR FREQ1
+   lcdmessage+="\n";
+   lcdmessage+="SOURCE1: ";
+   lcdmessage+="INTER"; //PUT YOUR FUNCTION HERE FOR SOURCE1 
+   
+   DEBUG_CM_PRINTLN("*******************");
+   DEBUG_CM_PRINTLN(lcdmessage);
+   DEBUG_CM_PRINTLN("*******************");
+   
 }

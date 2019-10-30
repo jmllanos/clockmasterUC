@@ -103,8 +103,8 @@ String Channel::getParameters()
     }
     else
     {
-        DEBUG_CM_PRINTLN("MODE:XX");
-        LCDMessage="MODE: XX";
+        DEBUG_CM_PRINTLN("MODE: UNDEFINED");
+        LCDMessage="MODE: UNDEFINED";
     }
  
  return LCDMessage;

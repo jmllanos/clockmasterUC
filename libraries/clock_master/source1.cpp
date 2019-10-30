@@ -184,7 +184,7 @@ void ClockMaster::setChannel(char* data)
     tft.println(lcdmessage);
     
     DEBUG_CM_PRINTLN("**************");
-    delay(1000);
+    delay(500);
     
     tft.setTextColor(ILI9341_BLACK);
     tft.setCursor(50,80);

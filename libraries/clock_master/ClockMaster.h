@@ -78,6 +78,8 @@ class ClockMaster : public network
 
       void setChannel(char* data);
       String getReplyMessage();
+      
+      void showCGS();
      
 };
 

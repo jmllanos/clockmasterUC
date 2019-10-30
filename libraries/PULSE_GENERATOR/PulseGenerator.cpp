@@ -39,7 +39,7 @@ void  PulseGenerator::write_parameters()
    
    WRITE_REGISTER(enable_addr,DISABLE_PULSEGEN,tmp);
    SPI_ok=SPI_ok & tmp;
-   // date 
+   // DATE 
     WRITE_REGISTER(usr_year_h_addr,usr_year_h,tmp);
     SPI_ok=SPI_ok & tmp;
     WRITE_REGISTER(usr_year_l_addr,usr_year_l,tmp);
@@ -48,6 +48,7 @@ void  PulseGenerator::write_parameters()
     SPI_ok=SPI_ok & tmp;
     WRITE_REGISTER(usr_day_addr,usr_day,tmp);		
     SPI_ok=SPI_ok & tmp;
+    // TIME
     WRITE_REGISTER(usr_hour_addr,usr_hour,tmp);
     SPI_ok=SPI_ok & tmp;
     WRITE_REGISTER(usr_minutes_addr,usr_minutes,tmp);
@@ -278,17 +279,42 @@ String PulseGenerator::get_parameters()
    read_registers();
   
    LCDMessage="DATE: ";
-   LCDMessage+=String(usr_day);
-   LCDMessage+="/";
+   if(usr_month<10)
+   {
+    LCDMessage+="0";
+   }
    LCDMessage+=String(usr_month);
+      
+   LCDMessage+="/";
+   if(usr_day<10)
+   {
+    LCDMessage+="0";
+   }
+   LCDMessage+=String(usr_day);
+
    LCDMessage+="/";
    LCDMessage+=String(usr_year-2000);
-    
-   LCDMessage=LCDMessage +"\n" +"HOUR: ";
-   LCDMessage+=String(usr_hour);
+   LCDMessage=LCDMessage +"\n" +"TIME: ";
+   if(usr_hour<10)
+   {
+    LCDMessage+="0";
+   }
+
+   LCDMessage+=String(usr_hour);   
+
    LCDMessage+=":";
+   if(usr_minutes<10)
+   {
+    LCDMessage+="0";
+   }
+  
    LCDMessage+=String(usr_minutes);
+   
    LCDMessage+=":";
+   if(usr_seconds<10)
+   {
+    LCDMessage+="0";
+   }
    LCDMessage+=String(usr_seconds);
    
       
