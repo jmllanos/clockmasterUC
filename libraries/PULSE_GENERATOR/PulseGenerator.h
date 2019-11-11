@@ -7,9 +7,7 @@
 #include<read_write_registers.h>
 #include<ArduinoJson.h>
 #include<string.h>
-
-#include "Adafruit_GFX.h"
-#include "Adafruit_ILI9341.h"
+//#include<TIVAConfiguration.h>
 
 class PulseGenerator
 {

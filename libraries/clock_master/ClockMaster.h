@@ -19,9 +19,16 @@
 enum UserRequest
 {
   Status,
-  Reset,
   Start,
   Stop,
+  Reset,
+  cgsbegin,
+  cgsmaskirq,
+  cgsreadiqrsticky,
+  cgsgetstatus,
+  cgssetpll,
+  cgssetclkfrac,
+  cgsclkena,
   Setdate,
   Setpps,
   SetChannel,

@@ -2,11 +2,7 @@
 
 UserRequest str2request (String request)
 {
-  if (request == "reset")
-  {
-    return Reset;
-  }
-  else if (request == "start")
+  if (request == "start")
   {
     return Start;
   }
@@ -14,13 +10,37 @@ UserRequest str2request (String request)
   {
     return Stop;
   }
-  else if (request == "read")
+  else if (request == "reset")
   {
-    return Read;
+    return Reset;
   }
-  else if (request == "write")
+  else if (request == "cgsbegin")
   {
-    return Write;
+    return cgsbegin;
+  }
+  else if (request == "cgsmaskirq")
+  {
+    return cgsmaskirq;
+  }
+  else if (request == "cgsreadiqrsticky")
+  {
+    return cgsreadiqrsticky;
+  }
+  else if (request == "cgsgetstatus")
+  {
+    return cgsgetstatus;
+  }
+  else if (request == "cgssetpll")
+  {
+    return cgssetpll;
+  }
+  else if (request == "cgssetclkfrac")
+  {
+    return cgssetclkfrac;
+  }
+  else if (request == "cgsclkena")
+  {
+    return cgsclkena;
   }
   else if (request == "changeip")
   {

@@ -22,18 +22,13 @@
 
 #include <TIVAConfiguration.h>
 #include <ClockMaster.h>
+#include <CGS.h>
 
 
 //###################################################
-uint32_t invalid = 0;//bool
-uint32_t gps_disciplined;
-uint32_t ref;
-
 const int buttonPin = PUSH2;//forced freeze
-
 uint8_t freeze_counter = 0;
 
-//#######################################################
 int int_delay = 40;
 boolean gear = false;
 bool change_ip_flag = false;
@@ -48,6 +43,7 @@ volatile uint8_t state = 0;
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
 ClockMaster clock_master;
+CGS cgs;
 //***********************************************
 
 void setup()
@@ -58,30 +54,32 @@ void setup()
   
   DEBUG_CM_BEGIN(BAUD_RATE);
   DEBUG_CM_PRINTLN("Serial started.");
+  
+  //Reset TINY FPGA
   pinMode(PL_2,OUTPUT);
   digitalWrite(PL_2,HIGH);
   digitalWrite(PL_2,LOW);
-//Reset TINY FPGA
-
  
   clock_master.NetworkInitConfig();
-  
 
   INIT_SPI();
   clock_master.startEth(mac, server);
   initTimer(1); // timer a 0.5 hz..................
- 
-  pinMode(buttonPin, INPUT_PULLUP);
-  ResetWatchDogTimer();
-   clock_master.init();
-   
-}
 
+  CHECK_CGS();
+
+  pinMode(buttonPin, INPUT_PULLUP);// forced freeze configuration
+
+  clock_master.init();
+
+  ResetWatchDogTimer();   
+}
 
 void loop()
 {
  ResetWatchDogTimer();
 
+ TEST_WATCHDOG();
  
  if(change_ip_flag)
   {
@@ -162,7 +160,47 @@ void loop()
             clock_master.stop();
             httpReply.send(clock_master.getReplyMessage());
             break;
-                            
+
+          case Reset:
+            clock_master.reset();
+            httpReply.send(clock_master.getReplyMessage());
+            break;
+
+          case cgsbegin:
+            cgs.begin();
+            httpReply.send(cgs.getReplyMessage());
+            break;
+          
+          case cgsmaskirq:
+            cgs.mask_irq(data);
+            httpReply.send(cgs.getReplyMessage());
+            break;
+
+          case cgsreadiqrsticky:
+            cgs.read_irq_sticky(data);
+            httpReply.send(cgs.getReplyMessage());
+            break;
+          
+          case cgsgetstatus:
+            cgs.get_status(data);
+            httpReply.send(cgs.getReplyMessage());
+            break;
+
+          case cgssetpll:
+            cgs.set_pll(data);
+            httpReply.send(cgs.getReplyMessage());
+            break;
+          
+          case cgssetclkfrac:
+            cgs.set_clk_frac(data);
+            httpReply.send(cgs.getReplyMessage());
+            break;
+
+          case cgsclkena:
+            cgs.clk_ena(data);
+            httpReply.send(cgs.getReplyMessage());
+            break;
+
           case ChangeIP:
           
             change_ip_flag=clock_master.changeIP(data);
@@ -207,6 +245,7 @@ void loop()
   client.stop();
 
   SHOW_INFO_LCD();
+  // implementar pantalla para mostrar freezes!!!!!!!!!!!!!!!!!!!!!!!!!.....
  
 }
 
@@ -255,20 +294,9 @@ void INIT_I2C()
 {
   Wire.setModule(0);
   Wire.begin();
-  delay(1000);//----------------------????????????????????????????????
-  //el delay se ejecuta antes de q acabe wire begin por eso es q se 
-  //imprime la siguiente linea....
-  
+  delay(1000);   // necessary. don't know why. check.
+  //el delay se ejecuta antes de q acabe wire begin
   DEBUG_CM_PRINTLN("I2C initialized");
-
-  Wire.beginTransmission(2);
-  Wire.write(0x00);//Comsend = 0x00
-  Wire.write(0x38);
-  uint8_t err = Wire.endTransmission();
-  DEBUG_CM_PRINTLN(err);
-
-  DEBUG_CM_PRINTLN("pase i2c sin conexion");
-  //----------------###################################revisar colgado por pull ups
 }
 
 void INIT_LCD()
@@ -294,4 +322,19 @@ void SHOW_INFO_LCD()
   interrupts();
 
   gear=false;
+}
+
+void CHECK_CGS()
+{
+  uint8_t aux_cgs = cgs.CheckBus();
+  if (aux_cgs == 0)
+  {
+    DEBUG_CM_PRINTLN("CGS ready");
+  }
+  else
+  {
+    DEBUG_CM_PRINTLN("Unable to connect to CGS");
+    DEBUG_CM_PRINT("I2C error type: ");
+    DEBUG_CM_PRINTLN(aux_cgs);
+  }
 }

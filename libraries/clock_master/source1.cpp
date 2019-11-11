@@ -101,6 +101,16 @@ void ClockMaster::stop()
   DEBUG_CM_PRINTLN("***************************************************");
 }
 
+void ClockMaster::reset()
+{
+  DEBUG_CM_PRINTLN("***************************************************");
+  DEBUG_CM_PRINTLN("RESET METHOD");
+  digitalWrite(PL_2,HIGH);
+  digitalWrite(PL_2,LOW);
+  DEBUG_CM_PRINTLN("...");//corroborar reset......................................................
+  ReplyMessage="{\"reset\":\"ok\"}";
+  DEBUG_CM_PRINTLN("***************************************************");
+}
 
 void ClockMaster::setChannel(char* data)
 {  
@@ -197,9 +207,3 @@ String ClockMaster::getReplyMessage()
 {
   return ReplyMessage;
 }
-
-void ClockMaster::reset()
-{
-}
-
-
